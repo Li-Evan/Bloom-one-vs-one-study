@@ -288,6 +288,19 @@ export default function LessonPage() {
           <div className="sticky top-20">
             <h3 className="text-xs font-medium text-stone-400 uppercase tracking-wide mb-3">章节</h3>
             <nav className="space-y-0.5">
+              {/* Syllabus link */}
+              <button
+                onClick={() => navigate(`/course/${courseId}/syllabus`)}
+                className="w-full text-left px-3 py-2 rounded-lg text-sm text-stone-500 hover:bg-stone-100 hover:text-stone-700 transition-all duration-150 flex items-center gap-2.5 cursor-pointer"
+              >
+                <span className="text-stone-300">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                  </svg>
+                </span>
+                <span>大纲</span>
+              </button>
+
               {allLessons.map((l) => {
                 const isActive = l.number === currentNum;
                 return (
@@ -316,14 +329,8 @@ export default function LessonPage() {
               })}
             </nav>
 
-            {/* Quick actions */}
+            {/* Quick info */}
             <div className="mt-6 pt-6 border-t border-stone-100 space-y-2">
-              <button
-                onClick={() => navigate(`/course/${courseId}`)}
-                className="w-full text-left px-3 py-2 rounded-lg text-xs text-stone-400 hover:bg-stone-100 hover:text-stone-600 transition-all cursor-pointer"
-              >
-                查看大纲
-              </button>
               {annotations.length > 0 && (
                 <div className="px-3 py-1">
                   <span className="text-[10px] text-stone-300">
