@@ -20,7 +20,7 @@ export default function CoursePage() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showSyllabus, setShowSyllabus] = useState(true);
+  const [syllabusOpen, setSyllabusOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([getCourse(courseId), getLessons(courseId)])
@@ -58,11 +58,13 @@ export default function CoursePage() {
   }
 
   const normalLessons = lessons.filter((l) => l.number > 0);
+  const isCompleted = course.status === 'completed';
 
   return (
     <div className="min-h-[100dvh] bg-stone-50">
+      {/* Header */}
       <header className="bg-white border-b border-stone-200/60 sticky top-0 z-10">
-        <div className="max-w-[1100px] mx-auto px-6 py-3.5 flex items-center justify-between">
+        <div className="max-w-[720px] mx-auto px-6 py-3.5 flex items-center justify-between">
           <button
             onClick={() => navigate('/')}
             className="text-stone-400 hover:text-stone-700 text-sm transition-colors flex items-center gap-1.5"
@@ -73,94 +75,125 @@ export default function CoursePage() {
             返回
           </button>
           <span className="text-xs text-stone-400 font-mono">
-            {course.status === 'completed' ? 'COMPLETED' : 'IN PROGRESS'}
+            {isCompleted ? 'COMPLETED' : 'IN PROGRESS'}
           </span>
         </div>
       </header>
 
-      <main className="max-w-[1100px] mx-auto px-6 py-10">
-        <h1 className="text-2xl font-semibold tracking-tight text-stone-900 mb-8">{course.name}</h1>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Left: Syllabus */}
-          <div className="md:col-span-1">
-            <div className="bg-white rounded-xl border border-stone-200/60 p-5 sticky top-20">
-              <button
-                onClick={() => setShowSyllabus(!showSyllabus)}
-                className="w-full flex items-center justify-between text-sm font-medium text-stone-700"
-              >
-                <span>课程大纲</span>
-                <svg
-                  className={`w-4 h-4 text-stone-400 transition-transform duration-200 ${showSyllabus ? 'rotate-180' : ''}`}
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                </svg>
-              </button>
-              {showSyllabus && course.syllabus_content && (
-                <div className="mt-4 pt-4 border-t border-stone-100 prose prose-sm prose-stone max-w-none">
-                  <ReactMarkdown>{stripFences(course.syllabus_content)}</ReactMarkdown>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right: Lesson List */}
-          <div className="md:col-span-2">
-            <h2 className="text-sm font-medium text-stone-500 uppercase tracking-wide mb-4">课文列表</h2>
-
-            {normalLessons.length === 0 ? (
-              <div className="py-16 text-center">
-                <p className="text-stone-400 text-sm">暂无课文</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {normalLessons.map((lesson, index) => (
-                  <button
-                    key={lesson.id}
-                    onClick={() => navigate(`/course/${courseId}/lesson/${lesson.number}`)}
-                    className="w-full bg-white rounded-xl p-4 text-left border border-stone-200/60 hover:border-stone-300 hover:shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] transition-all duration-200 group cursor-pointer"
-                    style={{ animationDelay: `${index * 60}ms` }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="w-8 h-8 rounded-lg bg-stone-50 border border-stone-100 flex items-center justify-center text-xs font-mono text-stone-500">
-                          {String(lesson.number).padStart(2, '0')}
-                        </span>
-                        <span className="font-medium text-stone-700 text-sm group-hover:text-stone-900 transition-colors">
-                          第 {String(lesson.number).padStart(2, '0')} 篇
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {lesson.is_evaluation && (
-                          <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-100">
-                            评估篇
-                          </span>
-                        )}
-                        <span className="text-xs text-stone-400 font-mono tabular-nums">
-                          {new Date(lesson.created_at).toLocaleDateString('zh-CN')}
-                        </span>
-                        <svg className="w-4 h-4 text-stone-300 group-hover:text-stone-500 group-hover:translate-x-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                        </svg>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Summary section */}
-            {summary && (
-              <div className="mt-8 bg-white rounded-xl border border-emerald-200/60 p-6">
-                <h3 className="text-sm font-medium text-emerald-700 mb-4 uppercase tracking-wide">课程总结</h3>
-                <div className="prose prose-sm prose-stone max-w-none">
-                  <ReactMarkdown>{stripFences(summary.content)}</ReactMarkdown>
-                </div>
-              </div>
-            )}
+      <main className="max-w-[720px] mx-auto px-6 py-10">
+        {/* Course hero */}
+        <div className="mb-10">
+          <h1 className="text-3xl font-semibold tracking-tight text-stone-900">{course.name}</h1>
+          <div className="flex items-center gap-4 mt-3">
+            <span className={`text-xs px-2.5 py-1 rounded-full border ${
+              isCompleted
+                ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                : 'bg-stone-50 text-stone-500 border-stone-100'
+            }`}>
+              {isCompleted ? '已完成' : '学习中'}
+            </span>
+            <span className="text-sm text-stone-400">
+              <span className="font-mono tabular-nums">{normalLessons.length}</span> 篇课文
+            </span>
+            <span className="text-sm text-stone-300 font-mono tabular-nums">
+              {new Date(course.created_at).toLocaleDateString('zh-CN')}
+            </span>
           </div>
         </div>
+
+        {/* Syllabus — collapsible full-width panel */}
+        {course.syllabus_content && (
+          <div className="mb-8">
+            <button
+              onClick={() => setSyllabusOpen(!syllabusOpen)}
+              className="w-full flex items-center justify-between bg-white rounded-xl border border-stone-200/60 px-5 py-4 hover:border-stone-300 transition-colors group cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                  <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                  </svg>
+                </div>
+                <span className="text-sm font-medium text-stone-700">课程大纲</span>
+              </div>
+              <svg
+                className={`w-4 h-4 text-stone-400 transition-transform duration-200 ${syllabusOpen ? 'rotate-180' : ''}`}
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+            </button>
+            {syllabusOpen && (
+              <div className="bg-white rounded-b-xl border border-t-0 border-stone-200/60 px-6 py-6 -mt-[1px]" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+                <div className="prose prose-sm prose-stone max-w-none">
+                  <ReactMarkdown>{stripFences(course.syllabus_content)}</ReactMarkdown>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Lesson list */}
+        <div className="mb-8">
+          <h2 className="text-xs font-medium text-stone-400 uppercase tracking-wide mb-4">课文</h2>
+
+          {normalLessons.length === 0 ? (
+            <div className="py-16 text-center bg-white rounded-xl border border-stone-200/60">
+              <div className="w-10 h-10 rounded-full bg-stone-50 mx-auto mb-3 flex items-center justify-center">
+                <svg className="w-5 h-5 text-stone-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+              </div>
+              <p className="text-stone-400 text-sm">暂无课文</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {normalLessons.map((lesson) => (
+                <button
+                  key={lesson.id}
+                  onClick={() => navigate(`/course/${courseId}/lesson/${lesson.number}`)}
+                  className="w-full bg-white rounded-xl px-5 py-4 text-left border border-stone-200/60 hover:border-stone-300 hover:shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] transition-all duration-200 group cursor-pointer flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="w-10 h-10 rounded-xl bg-stone-900 flex items-center justify-center text-xs font-mono text-white font-medium shrink-0">
+                      {String(lesson.number).padStart(2, '0')}
+                    </span>
+                    <div>
+                      <span className="font-medium text-stone-700 text-sm group-hover:text-stone-900 transition-colors block">
+                        第 {String(lesson.number).padStart(2, '0')} 篇
+                      </span>
+                      <span className="text-xs text-stone-400 font-mono tabular-nums">
+                        {new Date(lesson.created_at).toLocaleDateString('zh-CN')}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {lesson.is_evaluation && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-100">
+                        评估篇
+                      </span>
+                    )}
+                    <svg className="w-4 h-4 text-stone-300 group-hover:text-stone-500 group-hover:translate-x-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Summary section */}
+        {summary && (
+          <div className="mb-8">
+            <h2 className="text-xs font-medium text-emerald-600 uppercase tracking-wide mb-4">课程总结</h2>
+            <div className="bg-white rounded-xl border border-emerald-200/40 p-6">
+              <div className="prose prose-sm prose-stone max-w-none">
+                <ReactMarkdown>{stripFences(summary.content)}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
