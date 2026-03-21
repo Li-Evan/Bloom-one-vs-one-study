@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { getCourse, getLessons, getSummary } from '../lib/api';
 
 const stripFences = (text) => {
@@ -126,7 +127,7 @@ export default function CoursePage() {
             {syllabusOpen && (
               <div className="bg-white rounded-b-xl border border-t-0 border-stone-200/60 px-6 py-6 -mt-[1px]" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
                 <div className="prose prose-sm prose-stone max-w-none">
-                  <ReactMarkdown>{stripFences(course.syllabus_content)}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{stripFences(course.syllabus_content)}</ReactMarkdown>
                 </div>
               </div>
             )}
@@ -189,7 +190,7 @@ export default function CoursePage() {
             <h2 className="text-xs font-medium text-emerald-600 uppercase tracking-wide mb-4">课程总结</h2>
             <div className="bg-white rounded-xl border border-emerald-200/40 p-6">
               <div className="prose prose-sm prose-stone max-w-none">
-                <ReactMarkdown>{stripFences(summary.content)}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{stripFences(summary.content)}</ReactMarkdown>
               </div>
             </div>
           </div>

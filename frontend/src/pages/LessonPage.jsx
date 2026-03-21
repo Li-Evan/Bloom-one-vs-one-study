@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   getLesson, getLessons, getAnnotations, createAnnotation,
   submitFeedback, generateNextLesson,
@@ -188,7 +189,7 @@ export default function LessonPage() {
             className="bg-white rounded-2xl border border-stone-200/60 shadow-[0_1px_3px_rgba(0,0,0,0.04)] p-8 md:p-10 mb-8"
           >
             <div className="prose prose-stone prose-lg max-w-none">
-              <ReactMarkdown>{stripFences(lesson?.content)}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{stripFences(lesson?.content)}</ReactMarkdown>
             </div>
           </article>
 
@@ -262,7 +263,7 @@ export default function LessonPage() {
               </div>
               {streamContent ? (
                 <div className="prose prose-sm prose-stone max-w-none">
-                  <ReactMarkdown>{stripFences(streamContent)}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{stripFences(streamContent)}</ReactMarkdown>
                 </div>
               ) : (
                 <p className="text-stone-400 text-sm">AI 正在思考中...</p>
