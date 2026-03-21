@@ -1,13 +1,25 @@
+import os
+
+# Must set env vars BEFORE importing app (which triggers config validation)
+os.environ.setdefault("TESTING", "1")
+os.environ.setdefault("JWT_SECRET_KEY", "test-secret-key-not-for-production")
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
-from app.main import app
+import app.database as app_database
+from app.main import app as fastapi_app
 from app.database import Base, get_db
 
-TEST_DATABASE_URL = "sqlite:///./test.db"
-engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
+# Use in-memory SQLite with StaticPool so all connections share the same database
+engine = create_engine(
+    "sqlite:///:memory:",
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
 TestSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -19,7 +31,10 @@ def override_get_db():
         db.close()
 
 
-app.dependency_overrides[get_db] = override_get_db
+fastapi_app.dependency_overrides[get_db] = override_get_db
+
+# Patch SessionLocal so that chat.py's generator uses the test DB
+app_database.SessionLocal = TestSession
 
 
 @pytest.fixture(autouse=True)
@@ -31,7 +46,7 @@ def setup_db():
 
 @pytest.fixture
 def client():
-    return TestClient(app)
+    return TestClient(fastapi_app)
 
 
 @pytest.fixture

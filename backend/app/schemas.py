@@ -23,7 +23,7 @@ class UserResponse(BaseModel):
     id: int
     email: str
     username: str
-    credits: float
+    credits: int
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -31,13 +31,13 @@ class UserResponse(BaseModel):
 
 # Credits
 class CreditBalanceResponse(BaseModel):
-    credits: float
+    credits: int
 
 
 class CreditTransactionResponse(BaseModel):
     id: int
-    amount: float
-    balance_after: float
+    amount: int
+    balance_after: int
     type: str
     description: str
     created_at: datetime

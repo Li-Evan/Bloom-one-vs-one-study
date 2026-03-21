@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import update
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -9,20 +10,27 @@ from app.schemas import CreditBalanceResponse, CreditTransactionResponse
 router = APIRouter(prefix="/api/credits", tags=["credits"])
 
 
-def deduct_credits(db: Session, user: User, amount: float, description: str) -> CreditTransaction:
-    if user.credits < amount:
-        raise HTTPException(status_code=402, detail=f"积分不足，当前余额 {user.credits}，需要 {amount}")
+def deduct_credits(db: Session, user_id: int, amount: int, description: str) -> bool:
+    """Atomically deduct credits. Returns True on success, False if insufficient."""
+    result = db.execute(
+        update(User)
+        .where(User.id == user_id, User.credits >= amount)
+        .values(credits=User.credits - amount)
+    )
+    if result.rowcount == 0:
+        return False
 
-    user.credits -= amount
+    # Read back new balance for the transaction record
+    new_balance = db.query(User.credits).filter(User.id == user_id).scalar()
     tx = CreditTransaction(
-        user_id=user.id,
+        user_id=user_id,
         amount=-amount,
-        balance_after=user.credits,
+        balance_after=new_balance,
         type="chat_deduction",
         description=description,
     )
     db.add(tx)
-    return tx
+    return True
 
 
 @router.get("/balance", response_model=CreditBalanceResponse)

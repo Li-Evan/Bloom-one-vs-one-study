@@ -74,7 +74,7 @@ def test_me(auth_client):
     data = res.json()
     assert data["email"] == "test@example.com"
     assert data["username"] == "testuser"
-    assert data["credits"] == 100.0
+    assert data["credits"] == 100
 
 
 def test_me_no_auth(client):

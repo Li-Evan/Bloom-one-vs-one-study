@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
 
+from app.config import settings
 from app.database import engine, Base
 from app.auth import router as auth_router
 from app.credits import router as credits_router
@@ -15,7 +16,7 @@ app = FastAPI(title="Bloom Learning API", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

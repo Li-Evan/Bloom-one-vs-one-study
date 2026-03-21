@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
@@ -10,6 +12,8 @@ from app.models import User, Course, Message
 from app.auth import get_current_user
 from app.credits import deduct_credits
 from app.schemas import ChatRequest, CourseResponse, CreateCourseRequest, MessageResponse
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api", tags=["chat"])
 
@@ -75,8 +79,10 @@ def send_message(req: ChatRequest, user: User = Depends(get_current_user), db: S
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
 
-    if user.credits < settings.CREDITS_PER_REQUEST:
+    # Atomically deduct credits BEFORE calling the LLM — eliminates race condition
+    if not deduct_credits(db, user.id, settings.CREDITS_PER_REQUEST, f"课程「{course.name}」对话"):
         raise HTTPException(status_code=402, detail=f"积分不足，当前余额 {user.credits}")
+    db.commit()
 
     # Save user message
     user_msg = Message(course_id=course.id, role="user", content=req.message)
@@ -84,16 +90,12 @@ def send_message(req: ChatRequest, user: User = Depends(get_current_user), db: S
     db.commit()
 
     # Build conversation history
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    chat_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     for m in course.messages:
         if m.role != "system":
-            messages.append({"role": m.role, "content": m.content})
+            chat_messages.append({"role": m.role, "content": m.content})
 
-    # Capture IDs for use in generator's own DB session
     course_id = course.id
-    course_name = course.name
-    user_id = user.id
-
     client = get_openai_client()
 
     def generate():
@@ -101,7 +103,7 @@ def send_message(req: ChatRequest, user: User = Depends(get_current_user), db: S
         try:
             stream = client.chat.completions.create(
                 model=settings.DASHSCOPE_MODEL,
-                messages=messages,
+                messages=chat_messages,
                 stream=True,
             )
             for chunk in stream:
@@ -110,18 +112,15 @@ def send_message(req: ChatRequest, user: User = Depends(get_current_user), db: S
                     full_response += content
                     yield f"data: {json.dumps({'content': content})}\n\n"
 
-            # Use a fresh DB session inside generator to avoid session lifecycle issues
+            # Save assistant message
             with SessionLocal() as gen_db:
                 assistant_msg = Message(course_id=course_id, role="assistant", content=full_response)
                 gen_db.add(assistant_msg)
-
-                gen_user = gen_db.query(User).filter(User.id == user_id).first()
-                if gen_user:
-                    deduct_credits(gen_db, gen_user, settings.CREDITS_PER_REQUEST, f"课程「{course_name}」对话")
                 gen_db.commit()
 
             yield f"data: {json.dumps({'done': True})}\n\n"
         except Exception as e:
-            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+            logger.exception("Chat stream error")
+            yield f"data: {json.dumps({'error': '服务暂时不可用，请稍后重试'})}\n\n"
 
     return StreamingResponse(generate(), media_type="text/event-stream")
