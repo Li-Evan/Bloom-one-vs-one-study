@@ -35,6 +35,16 @@ export default function LessonPage() {
 
   const contentRef = useRef(null);
 
+  // Strip wrapping ```markdown fences from AI output
+  const stripFences = (text) => {
+    if (!text) return '';
+    let t = text.trim();
+    if (/^```(?:markdown|md)?\s*\n?/i.test(t)) {
+      t = t.replace(/^```(?:markdown|md)?\s*\n?/i, '').replace(/\n?```\s*$/, '');
+    }
+    return t.trim();
+  };
+
   useEffect(() => {
     setLoading(true);
     setError('');
@@ -88,12 +98,7 @@ export default function LessonPage() {
     setSubmittingFeedback(true);
     setError('');
     try {
-      const ta = thoughtAnswers.trim();
-      // Validate JSON if provided
-      if (ta) {
-        try { JSON.parse(ta); } catch { throw new Error('思考题回答格式错误，请使用 JSON 格式'); }
-      }
-      await submitFeedback(courseId, lessonNum, feedbackContent, ta);
+      await submitFeedback(courseId, lessonNum, feedbackContent, thoughtAnswers.trim() || null);
       setFeedbackSaved(true);
     } catch (err) {
       setError(err.message);
@@ -176,7 +181,7 @@ export default function LessonPage() {
           className="bg-white rounded-xl border border-gray-200 p-6 md:p-8 mb-6"
         >
           <div className="prose prose-lg max-w-none">
-            <ReactMarkdown>{lesson?.content || ''}</ReactMarkdown>
+            <ReactMarkdown>{stripFences(lesson?.content)}</ReactMarkdown>
           </div>
         </div>
 
@@ -241,12 +246,12 @@ export default function LessonPage() {
           />
 
           <details className="mb-3">
-            <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">思考题回答 (JSON 格式，可选)</summary>
+            <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">思考题回答 (可选)</summary>
             <textarea
               value={thoughtAnswers}
               onChange={(e) => { setThoughtAnswers(e.target.value); setFeedbackSaved(false); }}
-              placeholder='{"q1": "你的答案...", "q2": "你的答案..."}'
-              className="w-full border border-gray-300 rounded-lg p-3 text-sm resize-none h-24 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none mt-2 font-mono"
+              placeholder="在这里写下你对思考题的回答..."
+              className="w-full border border-gray-300 rounded-lg p-3 text-sm resize-none h-24 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none mt-2"
             />
           </details>
 
@@ -273,7 +278,7 @@ export default function LessonPage() {
             <h3 className="text-sm font-semibold text-indigo-600 mb-3">正在生成下一篇课文...</h3>
             {streamContent ? (
               <div className="prose prose-sm max-w-none">
-                <ReactMarkdown>{streamContent}</ReactMarkdown>
+                <ReactMarkdown>{stripFences(streamContent)}</ReactMarkdown>
               </div>
             ) : (
               <p className="text-gray-400">AI 正在思考中...</p>

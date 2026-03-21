@@ -3,6 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getCourse, getLessons, getSummary } from '../lib/api';
 
+// Strip wrapping ```markdown fences from AI output
+const stripFences = (text) => {
+  if (!text) return '';
+  let t = text.trim();
+  if (/^```(?:markdown|md)?\s*\n?/i.test(t)) {
+    t = t.replace(/^```(?:markdown|md)?\s*\n?/i, '').replace(/\n?```\s*$/, '');
+  }
+  return t.trim();
+};
+
 export default function CoursePage() {
   const { courseId } = useParams();
   const navigate = useNavigate();
@@ -75,7 +85,7 @@ export default function CoursePage() {
               </button>
               {showSyllabus && course.syllabus_content && (
                 <div className="prose prose-sm max-w-none text-gray-600">
-                  <ReactMarkdown>{course.syllabus_content}</ReactMarkdown>
+                  <ReactMarkdown>{stripFences(course.syllabus_content)}</ReactMarkdown>
                 </div>
               )}
             </div>
@@ -116,7 +126,7 @@ export default function CoursePage() {
               <div className="bg-white rounded-xl border border-green-200 p-6 mt-4">
                 <h3 className="text-lg font-semibold text-green-700 mb-3">课程总结</h3>
                 <div className="prose prose-sm max-w-none">
-                  <ReactMarkdown>{summary.content}</ReactMarkdown>
+                  <ReactMarkdown>{stripFences(summary.content)}</ReactMarkdown>
                 </div>
               </div>
             )}

@@ -13,3 +13,4 @@ htmlcov/
 *.egg-info/
 build/
 *.log
+.gstack/

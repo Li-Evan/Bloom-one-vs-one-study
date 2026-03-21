@@ -281,6 +281,21 @@ def get_openai_client() -> OpenAI:
     return OpenAI(api_key=settings.DASHSCOPE_API_KEY, base_url=settings.DASHSCOPE_BASE_URL)
 
 
+import re
+
+_FENCE_RE = re.compile(r'^```(?:markdown|md)?\s*\n?', re.IGNORECASE)
+_FENCE_END_RE = re.compile(r'\n?```\s*$')
+
+
+def _strip_markdown_fences(text: str) -> str:
+    """Strip wrapping ```markdown ... ``` fences that LLMs often add."""
+    text = text.strip()
+    if _FENCE_RE.match(text):
+        text = _FENCE_RE.sub('', text, count=1)
+        text = _FENCE_END_RE.sub('', text)
+    return text.strip()
+
+
 def _stream_llm(system_prompt: str, user_message: str):
     """Generator that yields SSE chunks from LLM streaming."""
     client = get_openai_client()
@@ -349,14 +364,14 @@ def create_course(
 
     try:
         # Generate syllabus
-        syllabus_content = _call_llm(SYLLABUS_PROMPT, f"课题：{req.name}")
+        syllabus_content = _strip_markdown_fences(_call_llm(SYLLABUS_PROMPT, f"课题：{req.name}"))
         syllabus = Syllabus(course_id=course.id, content=syllabus_content)
         db.add(syllabus)
         db.flush()
 
         # Generate first lesson
         prompt = FIRST_LESSON_PROMPT.format(syllabus=syllabus_content)
-        lesson_content = _call_llm(prompt, f"请为课题「{req.name}」生成第一篇课文")
+        lesson_content = _strip_markdown_fences(_call_llm(prompt, f"请为课题「{req.name}」生成第一篇课文"))
         lesson = Lesson(course_id=course.id, number=1, content=lesson_content)
         db.add(lesson)
 
@@ -622,6 +637,7 @@ def generate_next_lesson(
                 else:
                     yield f"data: {json.dumps({'content': content}, ensure_ascii=False)}\n\n"
 
+            lesson_content = _strip_markdown_fences(lesson_content)
             is_eval = lesson_content.strip().startswith("<!-- eval-article -->")
 
             # Use request db session (alive during streaming)
@@ -669,6 +685,7 @@ def _generate_summary_response(course: Course, user_id: int, db: Session):
                 else:
                     yield f"data: {json.dumps({'phase': 'summary', 'content': content}, ensure_ascii=False)}\n\n"
 
+            summary_content = _strip_markdown_fences(summary_content)
             # Save summary as lesson number=0 and mark course completed
             course_obj = db.query(Course).filter(Course.id == cid).first()
             course_obj.status = "completed"

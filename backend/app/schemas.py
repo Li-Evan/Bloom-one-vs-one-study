@@ -145,19 +145,7 @@ class AnnotationResponse(BaseModel):
 # Feedback
 class CreateFeedbackRequest(BaseModel):
     content: str = Field("", max_length=10000)
-    thought_answers: str = Field("", max_length=10000)  # JSON string
-
-    @field_validator("thought_answers")
-    @classmethod
-    def validate_json(cls, v: str) -> str:
-        if v == "":
-            return v
-        import json as _json
-        try:
-            _json.loads(v)
-        except _json.JSONDecodeError:
-            raise ValueError("thought_answers must be valid JSON or empty string")
-        return v
+    thought_answers: str | None = Field(None, max_length=10000)
 
 
 class FeedbackResponse(BaseModel):

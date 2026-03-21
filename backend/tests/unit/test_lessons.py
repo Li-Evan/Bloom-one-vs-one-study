@@ -133,14 +133,14 @@ def test_feedback_nonexistent_lesson(auth_client):
     assert res.status_code == 404
 
 
-def test_feedback_invalid_json(auth_client):
-    """thought_answers must be valid JSON or empty."""
+def test_feedback_plain_text_thought_answers(auth_client):
+    """thought_answers accepts plain text (not just JSON)."""
     course_id = _setup_course(auth_client)
     res = auth_client.post(f"/api/courses/{course_id}/lessons/1/feedback", json={
         "content": "反馈",
-        "thought_answers": "not valid json {{{",
+        "thought_answers": "第1题：我觉得答案是X\n第2题：答案是Y",
     })
-    assert res.status_code == 422
+    assert res.status_code == 200
 
 
 # --- Generate Next Lesson Tests ---
