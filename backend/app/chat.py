@@ -5,7 +5,7 @@ from openai import OpenAI
 import json
 
 from app.config import settings
-from app.database import get_db
+from app.database import get_db, SessionLocal
 from app.models import User, Course, Message
 from app.auth import get_current_user
 from app.credits import deduct_credits
@@ -75,7 +75,6 @@ def send_message(req: ChatRequest, user: User = Depends(get_current_user), db: S
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
 
-    # Check credits before calling API
     if user.credits < settings.CREDITS_PER_REQUEST:
         raise HTTPException(status_code=402, detail=f"积分不足，当前余额 {user.credits}")
 
@@ -90,7 +89,11 @@ def send_message(req: ChatRequest, user: User = Depends(get_current_user), db: S
         if m.role != "system":
             messages.append({"role": m.role, "content": m.content})
 
-    # Call DashScope API with streaming
+    # Capture IDs for use in generator's own DB session
+    course_id = course.id
+    course_name = course.name
+    user_id = user.id
+
     client = get_openai_client()
 
     def generate():
@@ -107,11 +110,15 @@ def send_message(req: ChatRequest, user: User = Depends(get_current_user), db: S
                     full_response += content
                     yield f"data: {json.dumps({'content': content})}\n\n"
 
-            # Save assistant message and deduct credits
-            assistant_msg = Message(course_id=course.id, role="assistant", content=full_response)
-            db.add(assistant_msg)
-            deduct_credits(db, user, settings.CREDITS_PER_REQUEST, f"课程「{course.name}」对话")
-            db.commit()
+            # Use a fresh DB session inside generator to avoid session lifecycle issues
+            with SessionLocal() as gen_db:
+                assistant_msg = Message(course_id=course_id, role="assistant", content=full_response)
+                gen_db.add(assistant_msg)
+
+                gen_user = gen_db.query(User).filter(User.id == user_id).first()
+                if gen_user:
+                    deduct_credits(gen_db, gen_user, settings.CREDITS_PER_REQUEST, f"课程「{course_name}」对话")
+                gen_db.commit()
 
             yield f"data: {json.dumps({'done': True})}\n\n"
         except Exception as e:

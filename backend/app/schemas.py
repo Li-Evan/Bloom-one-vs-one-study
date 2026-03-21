@@ -1,16 +1,16 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 
 
 # Auth
 class RegisterRequest(BaseModel):
-    email: str
-    username: str
-    password: str
+    email: EmailStr
+    username: str = Field(..., min_length=2, max_length=50)
+    password: str = Field(..., min_length=6, max_length=128)
 
 
 class LoginRequest(BaseModel):
-    email: str
+    email: EmailStr
     password: str
 
 
@@ -47,7 +47,7 @@ class CreditTransactionResponse(BaseModel):
 
 # Course
 class CreateCourseRequest(BaseModel):
-    name: str
+    name: str = Field(..., min_length=1, max_length=200)
 
 
 class CourseResponse(BaseModel):
@@ -62,7 +62,7 @@ class CourseResponse(BaseModel):
 # Chat
 class ChatRequest(BaseModel):
     course_id: int
-    message: str
+    message: str = Field(..., min_length=1, max_length=10000)
 
 
 class MessageResponse(BaseModel):
