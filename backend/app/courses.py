@@ -276,7 +276,7 @@ SUMMARY_PROMPT = """你是一个课程总结专家。根据课程的完整学习
 # ---------------------------------------------------------------------------
 
 def get_openai_client() -> OpenAI:
-    return OpenAI(api_key=settings.DASHSCOPE_API_KEY, base_url=settings.DASHSCOPE_BASE_URL)
+    return OpenAI(api_key=settings.LLM_API_KEY, base_url=settings.LLM_BASE_URL)
 
 
 import re
@@ -298,7 +298,7 @@ def _stream_llm(system_prompt: str, user_message: str):
     """Generator that yields SSE chunks from LLM streaming."""
     client = get_openai_client()
     stream = client.chat.completions.create(
-        model=settings.DASHSCOPE_MODEL,
+        model=settings.LLM_MODEL,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},
@@ -318,7 +318,7 @@ def _call_llm(system_prompt: str, user_message: str) -> str:
     """Non-streaming LLM call, returns full response."""
     client = get_openai_client()
     response = client.chat.completions.create(
-        model=settings.DASHSCOPE_MODEL,
+        model=settings.LLM_MODEL,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},

@@ -5,9 +5,9 @@ load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env"))
 
 
 class Settings:
-    DASHSCOPE_API_KEY: str = os.getenv("DASHSCOPE_API_KEY", "")
-    DASHSCOPE_BASE_URL: str = os.getenv("DASHSCOPE_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
-    DASHSCOPE_MODEL: str = os.getenv("DASHSCOPE_MODEL", "qwen-plus")
+    LLM_API_KEY: str = os.getenv("LLM_API_KEY", "")
+    LLM_BASE_URL: str = os.getenv("LLM_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+    LLM_MODEL: str = os.getenv("LLM_MODEL", "qwen-plus")
 
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./bloom.db")
 

@@ -63,7 +63,7 @@ See [GUIDE.md](./GUIDE.md) for the full walkthrough.
 
 - Python 3.11+ with [uv](https://docs.astral.sh/uv/)
 - Node.js 18+
-- [DashScope API Key](https://dashscope.console.aliyun.com/) (Alibaba Cloud)
+- An OpenAI-compatible LLM API key (e.g. [DashScope](https://dashscope.console.aliyun.com/), OpenAI, etc.)
 
 ### Setup
 
@@ -73,7 +73,7 @@ cd Bloom-one-vs-one-study
 
 # Configure
 cp .env.example .env
-# Edit .env — fill in DASHSCOPE_API_KEY
+# Edit .env — fill in LLM_API_KEY
 
 # Backend
 cd backend && uv sync && uv run uvicorn app.main:app --reload --port 8000
@@ -125,7 +125,7 @@ Create course → AI generates syllabus + lesson 01
 |-------|-----------|
 | Backend | Python, FastAPI, SQLAlchemy, SQLite |
 | Frontend | React, Vite, Tailwind CSS |
-| AI | DashScope API (OpenAI-compatible) |
+| AI | Any OpenAI-compatible LLM API |
 | Container | Docker, docker-compose |
 | Font | Outfit, JetBrains Mono |
 

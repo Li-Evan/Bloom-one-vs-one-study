@@ -63,7 +63,7 @@ claude
 
 - Python 3.11+，已安装 [uv](https://docs.astral.sh/uv/)
 - Node.js 18+
-- [DashScope API Key](https://dashscope.console.aliyun.com/)（阿里百炼）
+- 任意 OpenAI 兼容的 LLM API Key（如 [DashScope](https://dashscope.console.aliyun.com/)、OpenAI 等）
 
 ### 安装
 
@@ -73,7 +73,7 @@ cd Bloom-one-vs-one-study
 
 # 配置
 cp .env.example .env
-# 编辑 .env，填入 DASHSCOPE_API_KEY
+# 编辑 .env，填入 LLM_API_KEY
 
 # 后端
 cd backend && uv sync && uv run uvicorn app.main:app --reload --port 8000
@@ -125,7 +125,7 @@ docker compose up -d   # 访问 http://localhost:3000
 |----|------|
 | 后端 | Python, FastAPI, SQLAlchemy, SQLite |
 | 前端 | React, Vite, Tailwind CSS |
-| AI | DashScope API（OpenAI 兼容协议） |
+| AI | 任意 OpenAI 兼容 LLM API |
 | 容器 | Docker, docker-compose |
 | 字体 | Outfit, JetBrains Mono |
 
