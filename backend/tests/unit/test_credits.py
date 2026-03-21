@@ -18,6 +18,58 @@ def test_balance_no_auth(client):
     assert res.status_code in (401, 403)
 
 
+def test_deduct_credits_negative_amount():
+    """Direct unit test: deduct_credits raises ValueError on negative amount."""
+    import pytest
+    from tests.conftest import TestSession, engine
+    from app.database import Base
+    from app.models import User
+    from app.credits import deduct_credits
+
+    Base.metadata.create_all(bind=engine)
+    try:
+        db = TestSession()
+        user = User(email="neg@example.com", username="neguser", password_hash="x", credits=50)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        with pytest.raises(ValueError, match="positive"):
+            deduct_credits(db, user.id, -5, "should fail")
+
+        # Balance unchanged
+        db.refresh(user)
+        assert user.credits == 50
+    finally:
+        db.close()
+        Base.metadata.drop_all(bind=engine)
+
+
+def test_refund_credits():
+    """Direct unit test: refund_credits adds credits back."""
+    from tests.conftest import TestSession, engine
+    from app.database import Base
+    from app.models import User
+    from app.credits import refund_credits
+
+    Base.metadata.create_all(bind=engine)
+    try:
+        db = TestSession()
+        user = User(email="refund@example.com", username="refunduser", password_hash="x", credits=50)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        refund_credits(db, user.id, 10, "test refund")
+        db.commit()
+
+        db.refresh(user)
+        assert user.credits == 60
+    finally:
+        db.close()
+        Base.metadata.drop_all(bind=engine)
+
+
 def test_deduct_credits_success():
     """Direct unit test: deduct_credits returns True when balance is sufficient."""
     from tests.conftest import TestSession, engine

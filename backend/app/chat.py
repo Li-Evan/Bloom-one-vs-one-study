@@ -10,7 +10,7 @@ from app.config import settings
 from app.database import get_db, SessionLocal
 from app.models import User, Course, Message
 from app.auth import get_current_user
-from app.credits import deduct_credits
+from app.credits import deduct_credits, refund_credits
 from app.schemas import ChatRequest, CourseResponse, CreateCourseRequest, MessageResponse
 
 logger = logging.getLogger(__name__)
@@ -89,13 +89,17 @@ def send_message(req: ChatRequest, user: User = Depends(get_current_user), db: S
     db.add(user_msg)
     db.commit()
 
-    # Build conversation history
+    # Build conversation history (limit to last 50 messages to avoid token overflow)
+    MAX_HISTORY = 50
+    recent_messages = course.messages[-MAX_HISTORY:] if len(course.messages) > MAX_HISTORY else course.messages
     chat_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    for m in course.messages:
+    for m in recent_messages:
         if m.role != "system":
             chat_messages.append({"role": m.role, "content": m.content})
 
     course_id = course.id
+    user_id = user.id
+    credits_amount = settings.CREDITS_PER_REQUEST
     client = get_openai_client()
 
     def generate():
@@ -121,6 +125,13 @@ def send_message(req: ChatRequest, user: User = Depends(get_current_user), db: S
             yield f"data: {json.dumps(ensure_ascii=False, obj={'done': True})}\n\n"
         except Exception as e:
             logger.exception("Chat stream error")
+            # Refund credits on LLM failure
+            try:
+                with SessionLocal() as refund_db:
+                    refund_credits(refund_db, user_id, credits_amount, f"退款：LLM 调用失败")
+                    refund_db.commit()
+            except Exception:
+                logger.exception("Failed to refund credits")
             yield f"data: {json.dumps(ensure_ascii=False, obj={'error': '服务暂时不可用，请稍后重试'})}\n\n"
 
     return StreamingResponse(generate(), media_type="text/event-stream")

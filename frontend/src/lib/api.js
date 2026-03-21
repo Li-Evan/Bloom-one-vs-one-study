@@ -106,7 +106,7 @@ export async function sendMessage(courseId, message, onChunk) {
           if (data.content) onChunk(data.content);
           if (data.error) throw new Error(data.error);
         } catch (e) {
-          if (e.message !== 'Unexpected end of JSON input') throw e;
+          if (!(e instanceof SyntaxError)) throw e;
         }
       }
     }

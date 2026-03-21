@@ -7,6 +7,7 @@ export default function CreditsPage() {
   const [balance, setBalance] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -16,6 +17,7 @@ export default function CreditsPage() {
         setBalance(b.credits);
         setHistory(h);
       })
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
 
@@ -23,6 +25,7 @@ export default function CreditsPage() {
     registration_bonus: '注册赠送',
     chat_deduction: '对话消耗',
     admin_topup: '管理员充值',
+    refund: '退款',
   };
 
   return (
@@ -38,6 +41,10 @@ export default function CreditsPage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-8">
+        {error && (
+          <div className="mb-4 bg-red-50 text-red-600 text-sm px-4 py-2 rounded-lg">{error}</div>
+        )}
+
         {/* Balance card */}
         <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-6 text-white mb-8">
           <p className="text-sm opacity-80">当前积分余额</p>
@@ -69,9 +76,9 @@ export default function CreditsPage() {
                 </div>
                 <div className="text-right">
                   <p className={`font-semibold ${tx.amount > 0 ? 'text-green-600' : 'text-red-500'}`}>
-                    {tx.amount > 0 ? '+' : ''}{tx.amount.toFixed(0)}
+                    {tx.amount > 0 ? '+' : ''}{tx.amount ?? 0}
                   </p>
-                  <p className="text-xs text-gray-400">余额 {tx.balance_after.toFixed(0)}</p>
+                  <p className="text-xs text-gray-400">余额 {tx.balance_after ?? 0}</p>
                 </div>
               </div>
             ))}

@@ -10,8 +10,30 @@ from app.schemas import CreditBalanceResponse, CreditTransactionResponse
 router = APIRouter(prefix="/api/credits", tags=["credits"])
 
 
+def refund_credits(db: Session, user_id: int, amount: int, description: str) -> None:
+    """Refund credits to user (e.g. when LLM call fails after deduction)."""
+    if amount <= 0:
+        return
+    db.execute(
+        update(User)
+        .where(User.id == user_id)
+        .values(credits=User.credits + amount)
+    )
+    new_balance = db.query(User.credits).filter(User.id == user_id).scalar()
+    tx = CreditTransaction(
+        user_id=user_id,
+        amount=amount,
+        balance_after=new_balance,
+        type="refund",
+        description=description,
+    )
+    db.add(tx)
+
+
 def deduct_credits(db: Session, user_id: int, amount: int, description: str) -> bool:
     """Atomically deduct credits. Returns True on success, False if insufficient."""
+    if amount <= 0:
+        raise ValueError("deduct amount must be positive")
     result = db.execute(
         update(User)
         .where(User.id == user_id, User.credits >= amount)

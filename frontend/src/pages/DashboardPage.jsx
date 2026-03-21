@@ -8,21 +8,30 @@ export default function DashboardPage() {
   const [newCourseName, setNewCourseName] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   useEffect(() => {
-    getCourses().then(setCourses).finally(() => setLoading(false));
+    getCourses()
+      .then(setCourses)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!newCourseName.trim()) return;
-    const course = await createCourse(newCourseName.trim());
-    setCourses([course, ...courses]);
-    setNewCourseName('');
-    setShowCreate(false);
-    navigate(`/chat/${course.id}`);
+    setError('');
+    try {
+      const course = await createCourse(newCourseName.trim());
+      setCourses([course, ...courses]);
+      setNewCourseName('');
+      setShowCreate(false);
+      navigate(`/chat/${course.id}`);
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -62,6 +71,10 @@ export default function DashboardPage() {
             + 新课程
           </button>
         </div>
+
+        {error && (
+          <div className="mb-4 bg-red-50 text-red-600 text-sm px-4 py-2 rounded-lg">{error}</div>
+        )}
 
         {showCreate && (
           <form onSubmit={handleCreate} className="mb-6 flex gap-2">

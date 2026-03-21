@@ -4,6 +4,9 @@ import { getMessages, sendMessage } from '../lib/api';
 import { useAuth } from '../lib/AuthContext';
 import ReactMarkdown from 'react-markdown';
 
+let _msgIdCounter = 0;
+function nextMsgId() { return `tmp-${Date.now()}-${++_msgIdCounter}`; }
+
 export default function ChatPage() {
   const { courseId } = useParams();
   const [messages, setMessages] = useState([]);
@@ -30,7 +33,7 @@ export default function ChatPage() {
     const userMsg = input.trim();
     setInput('');
     setError('');
-    setMessages((prev) => [...prev, { role: 'user', content: userMsg, id: Date.now() }]);
+    setMessages((prev) => [...prev, { role: 'user', content: userMsg, id: nextMsgId() }]);
     setStreaming(true);
     setStreamContent('');
 
@@ -43,7 +46,7 @@ export default function ChatPage() {
 
       setMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: accumulated, id: Date.now() + 1 },
+        { role: 'assistant', content: accumulated, id: nextMsgId() },
       ]);
       setStreamContent('');
       refreshUser();

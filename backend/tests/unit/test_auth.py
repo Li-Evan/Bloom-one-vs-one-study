@@ -77,6 +77,24 @@ def test_me(auth_client):
     assert data["credits"] == 100
 
 
+def test_register_invalid_username(client):
+    res = client.post("/api/auth/register", json={
+        "email": "baduser@example.com",
+        "username": "<script>alert(1)</script>",
+        "password": "password123",
+    })
+    assert res.status_code == 422
+
+
+def test_register_short_password(client):
+    res = client.post("/api/auth/register", json={
+        "email": "short@example.com",
+        "username": "shortpwuser",
+        "password": "12345",
+    })
+    assert res.status_code == 422
+
+
 def test_me_no_auth(client):
     res = client.get("/api/auth/me")
     assert res.status_code in (401, 403)
