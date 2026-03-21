@@ -37,11 +37,29 @@ export default function CoursePage() {
 
   if (loading) {
     return (
-      <div className="min-h-[100dvh] bg-stone-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 rounded-full border-2 border-stone-200 border-t-emerald-600 animate-spin mx-auto" />
-          <p className="text-stone-400 text-sm mt-3">加载中...</p>
-        </div>
+      <div className="min-h-[100dvh] bg-stone-50">
+        <header className="bg-stone-900 sticky top-0 z-10">
+          <div className="max-w-[720px] mx-auto px-6 py-3.5" />
+        </header>
+        <main className="max-w-[720px] mx-auto px-6 py-10">
+          <div className="mb-10">
+            <div className="skeleton h-8 rounded-lg w-2/5 mb-4" />
+            <div className="flex items-center gap-4">
+              <div className="skeleton h-5 rounded-full w-16" />
+              <div className="skeleton h-4 rounded w-14" />
+            </div>
+          </div>
+          <div className="skeleton h-3 rounded w-10 mb-4" />
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="bg-white rounded-xl px-5 py-4 border border-stone-200/60 flex items-center gap-4 mb-2">
+              <div className="skeleton w-10 h-10 rounded-xl shrink-0" />
+              <div className="flex-1">
+                <div className="skeleton h-4 rounded w-24 mb-1.5" />
+                <div className="skeleton h-3 rounded w-16" />
+              </div>
+            </div>
+          ))}
+        </main>
       </div>
     );
   }

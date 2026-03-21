@@ -34,10 +34,33 @@ export default function SyllabusPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[100dvh] bg-stone-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 rounded-full border-2 border-stone-200 border-t-emerald-600 animate-spin mx-auto" />
-          <p className="text-stone-400 text-sm mt-3">加载中...</p>
+      <div className="min-h-[100dvh] bg-stone-50">
+        <header className="bg-stone-900 sticky top-0 z-10">
+          <div className="max-w-[1200px] mx-auto px-6 py-3.5" />
+        </header>
+        <div className="max-w-[1200px] mx-auto px-6 py-10 flex gap-8">
+          <main className="flex-1 min-w-0">
+            <div className="bg-white rounded-2xl border border-stone-200/60 p-8 md:p-10">
+              <div className="skeleton h-7 rounded-lg w-2/5 mb-6" />
+              <div className="space-y-3">
+                <div className="skeleton h-4 rounded w-full" />
+                <div className="skeleton h-4 rounded w-full" />
+                <div className="skeleton h-4 rounded w-3/4" />
+                <div className="h-4" />
+                <div className="skeleton h-4 rounded w-full" />
+                <div className="skeleton h-4 rounded w-full" />
+                <div className="skeleton h-4 rounded w-1/2" />
+              </div>
+            </div>
+          </main>
+          <aside className="hidden lg:block w-48 shrink-0">
+            <div className="skeleton h-3 rounded w-10 mb-4" />
+            <div className="space-y-1">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="skeleton h-9 rounded-lg w-full" />
+              ))}
+            </div>
+          </aside>
         </div>
       </div>
     );

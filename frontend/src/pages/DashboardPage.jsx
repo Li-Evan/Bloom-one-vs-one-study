@@ -115,11 +115,17 @@ export default function DashboardPage() {
 
         {/* Course list */}
         {loading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-xl border border-stone-200/60 p-5 animate-pulse">
-                <div className="h-4 bg-stone-100 rounded w-1/3 mb-3" />
-                <div className="h-3 bg-stone-50 rounded w-1/5" />
+          <div className="space-y-2">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="bg-white rounded-xl border border-stone-200/60 p-5">
+                <div className="flex items-center justify-between">
+                  <div className="skeleton h-4 rounded w-1/3" />
+                  <div className="flex items-center gap-3">
+                    <div className="skeleton h-5 rounded-full w-14" />
+                    <div className="skeleton h-3 rounded w-8" />
+                  </div>
+                </div>
+                <div className="skeleton h-3 rounded w-20 mt-2" />
               </div>
             ))}
           </div>
@@ -135,11 +141,12 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="space-y-2">
-            {courses.map((course) => (
+            {courses.map((course, i) => (
               <button
                 key={course.id}
                 onClick={() => navigate(`/course/${course.id}`)}
-                className="w-full bg-white rounded-xl p-5 text-left border border-stone-200/60 hover:border-stone-300 hover:shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] transition-all duration-200 group cursor-pointer"
+                style={{ '--i': i }}
+                className="stagger-in w-full bg-white rounded-xl p-5 text-left border border-stone-200/60 hover:border-stone-300 hover:shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] transition-all duration-200 group cursor-pointer"
               >
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium text-stone-800 group-hover:text-stone-900 transition-colors">

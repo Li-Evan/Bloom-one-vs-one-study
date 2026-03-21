@@ -62,6 +62,39 @@ button:active:not(:disabled) {
   background: #a8a29e;
 }
 
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f5f5f4 25%, #e7e5e4 37%, #f5f5f4 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* Text selection */
+::selection {
+  background-color: var(--accent-light);
+  color: var(--text-primary);
+}
+
+/* Stagger animation for list items */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stagger-in {
+  animation: fadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 50ms);
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 /* Focus ring */
 input:focus-visible, textarea:focus-visible, select:focus-visible {
   outline: 2px solid var(--accent);
@@ -79,4 +112,25 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
 .prose code {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.875em;
+}
+.prose pre {
+  background-color: #1c1917;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+}
+.prose a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.prose a:hover {
+  color: var(--accent-hover);
+}
+.prose thead th {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.prose input[type="checkbox"] {
+  accent-color: var(--accent);
+  margin-right: 0.35em;
 }

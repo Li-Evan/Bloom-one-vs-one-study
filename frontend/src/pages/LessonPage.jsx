@@ -136,10 +136,36 @@ export default function LessonPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[100dvh] bg-stone-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 rounded-full border-2 border-stone-200 border-t-emerald-600 animate-spin mx-auto" />
-          <p className="text-stone-400 text-sm mt-3">加载课文...</p>
+      <div className="min-h-[100dvh] bg-stone-50">
+        <header className="bg-stone-900 sticky top-0 z-10">
+          <div className="max-w-[1200px] mx-auto px-6 py-3.5" />
+        </header>
+        <div className="max-w-[1200px] mx-auto px-6 py-10 flex gap-8">
+          <main className="flex-1 min-w-0">
+            <div className="bg-white rounded-2xl border border-stone-200/60 p-8 md:p-10">
+              <div className="skeleton h-7 rounded-lg w-3/5 mb-6" />
+              <div className="space-y-3">
+                <div className="skeleton h-4 rounded w-full" />
+                <div className="skeleton h-4 rounded w-full" />
+                <div className="skeleton h-4 rounded w-4/5" />
+                <div className="h-4" />
+                <div className="skeleton h-4 rounded w-full" />
+                <div className="skeleton h-4 rounded w-full" />
+                <div className="skeleton h-4 rounded w-3/5" />
+                <div className="h-4" />
+                <div className="skeleton h-4 rounded w-full" />
+                <div className="skeleton h-4 rounded w-2/3" />
+              </div>
+            </div>
+          </main>
+          <aside className="hidden lg:block w-48 shrink-0">
+            <div className="skeleton h-3 rounded w-10 mb-4" />
+            <div className="space-y-1">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="skeleton h-9 rounded-lg w-full" />
+              ))}
+            </div>
+          </aside>
         </div>
       </div>
     );
@@ -272,7 +298,7 @@ export default function LessonPage() {
           ) : (
             <button
               onClick={handleReadDone}
-              className="w-full py-3.5 bg-stone-900 text-white rounded-xl text-sm font-medium hover:bg-stone-800 transition-all duration-200 cursor-pointer"
+              className="w-full py-3.5 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition-all duration-200 cursor-pointer"
             >
               我读完了 — 生成下一篇
             </button>
@@ -345,8 +371,8 @@ export default function LessonPage() {
 
       {/* Annotation popup */}
       {showAnnotation && (
-        <div className="fixed inset-0 bg-stone-950/40 flex items-center justify-center z-50 p-6">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)]">
+        <div className="fixed inset-0 bg-stone-950/25 modal-backdrop flex items-center justify-center z-50 p-6">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-stone-200/40">
             <h3 className="font-medium text-stone-800 text-sm mb-3">添加批注</h3>
             <p className="text-xs text-stone-400 mb-4 leading-relaxed">
               选中文本：{selectedText.length > 100 ? selectedText.slice(0, 100) + '...' : selectedText}
