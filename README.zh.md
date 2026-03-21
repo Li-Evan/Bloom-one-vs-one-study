@@ -55,7 +55,7 @@ claude
 
 然后说：`开一个新的文件夹，帮助我学习 [任意课题]`
 
-详见 [GUIDE.md](./GUIDE.md)。
+详见 [GUIDE.zh.md](./GUIDE.zh.md)。
 
 ## 快速开始：Web 模式
 

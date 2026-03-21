@@ -23,7 +23,7 @@
 </p>
 
 <p align="center">
-  <a href="./README.zh.md">简体中文</a> · English
+  <a href="./README.zh.md">Chinese</a> · English
 </p>
 
 ---
@@ -53,7 +53,7 @@ cd Bloom-one-vs-one-study
 claude
 ```
 
-Then say: `开一个新的文件夹，帮助我学习 [any topic]`
+Then say: `Create a new folder and help me learn [any topic]`
 
 See [GUIDE.md](./GUIDE.md) for the full walkthrough.
 

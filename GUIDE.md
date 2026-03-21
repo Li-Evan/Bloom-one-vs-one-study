@@ -1,222 +1,224 @@
-# 安装与使用指南
+# Installation & Usage Guide
 
-本指南帮助你从零开始配置 Bloom One-vs-One Study 系统，开始你的第一次一对一 AI 导师学习。
+<p align="right"><a href="./GUIDE.zh.md">简体中文</a></p>
+
+This guide helps you set up Bloom One-vs-One Study from scratch and start your first 1-on-1 AI tutoring session.
 
 ---
 
-## 前置条件
+## Prerequisites
 
-你需要：
+You need:
 
-1. **Claude Code**（Anthropic 官方 CLI 工具）
-2. **一个终端**（macOS Terminal / iTerm2 / Windows Terminal / 任何你习惯的）
-3. **一个文本编辑器**（VS Code、Cursor 等，用于阅读和标注文档）
+1. **Claude Code** (Anthropic's official CLI tool)
+2. **A terminal** (macOS Terminal / iTerm2 / Windows Terminal / whatever you prefer)
+3. **A text editor** (VS Code, Cursor, etc., for reading and annotating documents)
 
-### 安装 Claude Code
+### Installing Claude Code
 
-如果你还没有安装 Claude Code：
+If you haven't installed Claude Code yet:
 
 ```bash
 npm install -g @anthropic-ai/claude-code
 ```
 
-安装完成后，运行 `claude` 确认能正常启动。首次运行需要登录 Anthropic 账号。
+After installation, run `claude` to confirm it launches properly. First run requires logging in to your Anthropic account.
 
-> 如果你不确定 Claude Code 是什么：它是一个命令行工具，让你在终端里和 Claude 对话，并且 Claude 能直接读写你的本地文件。这正是本系统运作的基础。
+> If you're unsure what Claude Code is: it's a CLI tool that lets you chat with Claude in your terminal, and Claude can directly read and write your local files. This is the foundation of how this system works.
 
 ---
 
-## 安装步骤
+## Setup
 
-### 第 1 步：克隆仓库
+### Step 1: Clone the Repository
 
 ```bash
 git clone https://github.com/Li-Evan/Bloom-one-vs-one-study.git
 cd Bloom-one-vs-one-study
 ```
 
-### 第 2 步：启动 Claude Code
+### Step 2: Launch Claude Code
 
-在仓库目录下启动 Claude Code：
+Start Claude Code in the repository directory:
 
 ```bash
 claude
 ```
 
-Claude 会自动读取仓库中的 `Claude.md`，加载所有导师规则。**不需要任何额外配置**——系统已经准备好了。
+Claude will automatically read `CLAUDE.md` in the repository and load all tutor rules. **No additional configuration needed** — the system is ready to go.
 
-### 第 3 步：开始第一个课题
+### Step 3: Start Your First Topic
 
-在 Claude Code 对话中输入：
-
-```
-开一个新的文件夹，帮助我学习 [你想学的课题]
-```
-
-例如：
+In the Claude Code conversation, type:
 
 ```
-开一个新的文件夹，帮助我学习 Python 装饰器
+Create a new folder and help me learn [your topic]
 ```
 
+For example:
+
 ```
-开一个新的文件夹，帮助我学习 博弈论基础
+Create a new folder and help me learn Python decorators
 ```
 
 ```
-开一个新的文件夹，帮助我学习 个人所得税
+Create a new folder and help me learn game theory basics
 ```
 
-Claude 会立即为你生成：
-- `syllabus.md` — 课程大纲（定义你将掌握的所有能力）
-- `01.md` — 第一篇学习文档
+```
+Create a new folder and help me learn personal income tax
+```
 
-**安装完成。** 接下来是如何使用。
+Claude will immediately generate:
+- `syllabus.md` — course syllabus (defines all abilities you'll master)
+- `01.md` — your first lesson document
+
+**Setup complete.** Here's how to use it.
 
 ---
 
-## 使用流程
+## Usage Flow
 
-### 1. 阅读文档
+### 1. Read the Document
 
-用你的文本编辑器打开生成的 `.md` 文件。每篇文档包含：
+Open the generated `.md` file in your text editor. Each document contains:
 
-- **前置知识 / 难度 / 预计阅读时间**
-- **正文内容**（知识讲解，带加粗标注和示例）
-- **思考题**（2-3 题，不给答案，引导你深入思考）
-- **反馈区**（你写反馈的地方）
+- **Prerequisites / Difficulty / Estimated reading time**
+- **Main content** (knowledge with bold annotations and examples)
+- **Thought questions** (2–3 questions, no answers given, designed to deepen your thinking)
+- **Feedback section** (where you write your feedback)
 
-### 2. 标注你的困惑
+### 2. Annotate Your Confusions
 
-阅读过程中，在**任何让你困惑的地方**直接写下：
-
-```
-???[这里为什么要用递归而不是循环？]
-```
-
-或者用全角问号也行：
+While reading, write the following **anywhere you feel confused**:
 
 ```
-？？？[这个公式的直觉含义是什么？]
+???[Why use recursion here instead of a loop?]
 ```
 
-可以标注在文中任意位置，标注多少个都行。这些标注是你最真实的思维快照，导师会优先处理。
-
-### 3. 回答思考题 & 写反馈
-
-在文档末尾的「你的反馈」区域写下：
-
-- 思考题的回答（尽量自己推导，错了没关系）
-- 你的感悟、困惑、或希望下一篇深入的方向
-- 任何你想说的话
-
-### 4. 告诉导师你读完了
-
-回到 Claude Code 终端，说：
+Or use full-width question marks:
 
 ```
-我读完了
+???[What's the intuitive meaning of this formula?]
 ```
 
-导师会：
-1. 读取你的所有标注和反馈
-2. 可能问你 1-2 个关键问题（最多 2 轮，不会无限追问）
-3. 生成下一篇文档
+You can place annotations anywhere in the text, as many as you want. These annotations are the most authentic snapshot of your thinking, and the tutor prioritizes them.
 
-下一篇文档的开头会包含：
-- **思考题复盘**（逐题评估你的回答，给出正确答案）
-- **??? 解答**（逐条解答你标注的所有困惑）
-- **新内容**（根据你的理解程度定制）
+### 3. Answer Thought Questions & Write Feedback
 
-### 5. 重复，直到课程完结
+At the bottom of the document in the "Your Feedback" section, write:
 
-当大纲中所有掌握项都被覆盖后，系统会自动生成一篇**评估篇**（无新内容，最终确认理解）。读完评估篇后，系统自动生成 `summary.md`（完整的课程总结）。
+- Your answers to the thought questions (try to reason through them yourself — wrong answers are fine)
+- Your insights, confusions, or topics you'd like the next lesson to dive deeper into
+- Anything else you want to say
+
+### 4. Tell the Tutor You've Finished Reading
+
+Go back to the Claude Code terminal and say:
+
+```
+I've finished reading
+```
+
+The tutor will:
+1. Read all your annotations and feedback
+2. Possibly ask you 1–2 key questions (max 2 rounds, no endless grilling)
+3. Generate the next document
+
+The next document's opening will include:
+- **Thought question review** (evaluates each of your answers, provides correct answers)
+- **??? responses** (addresses every confusion you annotated)
+- **New content** (tailored to your understanding level)
+
+### 5. Repeat Until Course Completion
+
+When all mastery items in the syllabus are covered, the system automatically generates an **evaluation article** (no new content — final understanding confirmation). After reading the evaluation, the system auto-generates `summary.md` (a complete course summary).
 
 ---
 
-## 记录总结素材
+## Recording Summary Material
 
-学习过程中，如果遇到特别重要的知识点，想要写入最终总结，可以标注：
-
-```
-#summary:[期权定价的本质是复制——用已知价格的资产组合复制出相同现金流]
-```
-
-也支持不带 `#` 的写法：
+During your learning, if you encounter a particularly important insight you want in the final summary, annotate it:
 
 ```
-summary:[这个类比太好了，博弈论的纳什均衡就像交通堵车——没人能单方面改变路线获益]
+#summary:[The essence of option pricing is replication — constructing a portfolio of known-price assets that reproduces the same cash flows]
 ```
 
-这些素材会被自动收集，最终整合进 `summary.md`。
+The `#`-less format also works:
+
+```
+summary:[This analogy is brilliant — Nash equilibrium in game theory is like a traffic jam — no one can benefit by unilaterally changing routes]
+```
+
+These materials are automatically collected and integrated into `summary.md`.
 
 ---
 
-## 进阶用法
+## Advanced Usage
 
-### 嵌套目录
+### Nested Directories
 
-课题可以按类别组织：
-
-```
-开一个新的文件夹在 CFA 目录下，帮助我学习 固定收益
-```
-
-这会创建 `CFA/固定收益/` 目录。
-
-### 多课题并行
-
-你可以同时学习多个课题。每次进入 Claude Code 时，告诉导师你想继续哪个课题：
+Topics can be organized by category:
 
 ```
-我想继续学习 Python 装饰器，我读完了 02.md
+Create a new folder under CFA, help me learn fixed income
 ```
 
-### 斜杠命令
+This creates a `CFA/fixed-income/` directory.
 
-| 命令 | 作用 |
-|------|------|
-| `/整理学习` | 扫描所有课题，记录新增文档到学习日志 |
-| `/查看学习日志` | 查看历史学习记录（时间倒序） |
+### Parallel Topics
+
+You can study multiple topics simultaneously. When entering Claude Code, tell the tutor which topic you'd like to continue:
+
+```
+I want to continue studying Python decorators, I've finished reading 02.md
+```
+
+### Slash Commands
+
+| Command | Action |
+|---------|--------|
+| `/organize-learning` | Scan all topics, log new documents to the learning journal |
+| `/view-learning-log` | View historical learning records (newest first) |
 
 ---
 
-## 常见问题
+## FAQ
 
-### Q: 需要付费吗？
+### Q: Does it cost money?
 
-系统本身完全免费开源。你需要的是 Claude Code 的使用权限（需要 Anthropic 账号）。
+The system itself is completely free and open-source. You need Claude Code access (requires an Anthropic account).
 
-### Q: 支持哪些课题？
+### Q: What topics are supported?
 
-任何你想学的东西——编程、金融、哲学、心理学、数学、历史……没有限制。
+Anything you want to learn — programming, finance, philosophy, psychology, math, history... no limits.
 
-### Q: 能不能一次生成多篇文档？
+### Q: Can I generate multiple documents at once?
 
-不能，这是系统的核心铁律。一对一导师的精髓在于**每一步都基于你的反馈调整**，批量生成会破坏这个反馈循环。
+No. This is a core design principle. The essence of 1-on-1 tutoring is that **every step adjusts based on your feedback**. Batch generation would break this feedback loop.
 
-### Q: 我的学习数据存在哪？
+### Q: Where is my learning data stored?
 
-全部在你的本地文件系统，在你 clone 的这个仓库目录里。不上传任何数据到云端。你可以用 Git 来版本控制你的学习历史。
+Entirely on your local filesystem, in the cloned repository directory. No data is uploaded to the cloud. You can use Git to version-control your learning history.
 
-### Q: 可以用其他 AI 吗？
+### Q: Can I use other AI?
 
-`Claude.md` 是为 Claude Code 设计的。理论上其他支持类似指令文件的 AI Agent 也可以尝试，但效果可能有差异。
+`CLAUDE.md` is designed for Claude Code. In theory, other AI agents that support similar instruction files could work, but results may vary.
 
-### Q: 中途想换方向怎么办？
+### Q: What if I want to change direction mid-course?
 
-随时可以。在反馈区写下你想调整的方向，导师会在下一篇中适应你的新兴趣。大纲中的掌握项是目标，路径完全弹性。
+Anytime. Write your desired direction change in the feedback section, and the tutor will adapt in the next lesson. Mastery items in the syllabus are the goals; the path is entirely flexible.
 
 ---
 
-## 设计哲学
+## Design Philosophy
 
-这个系统建立在一个简单的信念上：
+This system is built on a simple belief:
 
-> **最好的学习不是被灌输，而是被引导去发现。**
+> **The best learning isn't being lectured — it's being guided to discover.**
 
-传统的在线课程是单向的——录好的视频不会因为你的困惑而停下来解释。ChatGPT 式的问答是碎片化的——你得到答案，但没有体系。
+Traditional online courses are one-directional — pre-recorded videos won't pause to explain your confusions. ChatGPT-style Q&A is fragmented — you get answers, but no system.
 
-这个系统试图在两者之间找到平衡：**有体系的自适应学习**。大纲保证你不会偏航，反馈循环保证内容永远匹配你的水平。
+This system aims to balance both: **systematic adaptive learning**. The syllabus ensures you stay on track, and the feedback loop ensures content always matches your level.
 
-Bloom 证明了一对一导师能做到 +2σ。我们相信，精心设计的 AI Agent 可以逼近这个效果。
+Bloom proved that 1-on-1 tutoring achieves +2σ. We believe a well-designed AI agent can approach this effect.
