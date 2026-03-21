@@ -25,12 +25,13 @@ app.include_router(auth_router)
 app.include_router(credits_router)
 app.include_router(chat_router)
 
-# Serve frontend static files if they exist
-frontend_dist = os.path.join(os.path.dirname(__file__), "../../frontend/dist")
-if os.path.exists(frontend_dist):
-    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
-
 
 @app.get("/api/health")
 def health():
     return {"status": "ok"}
+
+
+# Serve frontend static files if they exist (must be last — catch-all mount)
+frontend_dist = os.path.join(os.path.dirname(__file__), "../../frontend/dist")
+if os.path.exists(frontend_dist):
+    app.mount("/", StaticFiles(directory=frontend_dist, html=True), name="frontend")
