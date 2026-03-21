@@ -5,6 +5,7 @@ from datetime import datetime
 # Course
 class CreateCourseRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
+    reference: str = Field("", max_length=50000)  # optional reference material
 
 
 class CourseResponse(BaseModel):

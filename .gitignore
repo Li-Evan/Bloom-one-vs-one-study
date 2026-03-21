@@ -14,3 +14,6 @@ htmlcov/
 build/
 *.log
 .gstack/
+.tech-lead/
+docs/CHANGELOG.md
+docs/ARCHITECTURE.md

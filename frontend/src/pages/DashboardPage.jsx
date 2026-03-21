@@ -5,6 +5,7 @@ import { getCourses, createCourse } from '../lib/api';
 export default function DashboardPage() {
   const [courses, setCourses] = useState([]);
   const [newCourseName, setNewCourseName] = useState('');
+  const [newCourseRef, setNewCourseRef] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
@@ -24,9 +25,10 @@ export default function DashboardPage() {
     setError('');
     setCreating(true);
     try {
-      const course = await createCourse(newCourseName.trim());
+      const course = await createCourse(newCourseName.trim(), newCourseRef.trim());
       setCourses([course, ...courses]);
       setNewCourseName('');
+      setNewCourseRef('');
       setShowCreate(false);
       navigate(`/course/${course.id}`);
     } catch (err) {
@@ -72,23 +74,42 @@ export default function DashboardPage() {
 
         {/* Create form */}
         {showCreate && (
-          <form onSubmit={handleCreate} className="mb-8 flex gap-3">
-            <input
-              type="text"
-              value={newCourseName}
-              onChange={(e) => setNewCourseName(e.target.value)}
-              placeholder="输入课题名称，例如「博弈论基础」"
-              className="flex-1 px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm transition-colors hover:border-stone-300 focus:border-emerald-600 outline-none"
-              autoFocus
-              disabled={creating}
-            />
-            <button
-              type="submit"
-              disabled={creating}
-              className="bg-stone-900 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-stone-800 disabled:opacity-50 transition-all duration-200 cursor-pointer whitespace-nowrap"
-            >
-              {creating ? '创建中...' : '创建'}
-            </button>
+          <form onSubmit={handleCreate} className="mb-8 bg-white rounded-xl border border-stone-200/60 p-5 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-1.5">课题名称</label>
+              <input
+                type="text"
+                value={newCourseName}
+                onChange={(e) => setNewCourseName(e.target.value)}
+                placeholder="例如「博弈论基础」「Python 装饰器」"
+                className="w-full px-3.5 py-2.5 bg-white border border-stone-200 rounded-lg text-sm transition-colors hover:border-stone-300 focus:border-emerald-600 outline-none"
+                autoFocus
+                disabled={creating}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-1.5">
+                参考材料
+                <span className="text-stone-400 font-normal ml-1">（可选）</span>
+              </label>
+              <textarea
+                value={newCourseRef}
+                onChange={(e) => setNewCourseRef(e.target.value)}
+                placeholder="粘贴课本章节、论文摘要、笔记、或任何你希望 AI 参考的内容..."
+                className="w-full border border-stone-200 rounded-lg p-3.5 text-sm resize-none h-28 transition-colors hover:border-stone-300 focus:border-emerald-600 outline-none"
+                disabled={creating}
+              />
+              <p className="text-xs text-stone-400 mt-1">AI 会根据这些材料设计课程大纲和课文内容</p>
+            </div>
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={creating}
+                className="bg-stone-900 text-white px-5 py-2.5 rounded-lg text-sm font-medium hover:bg-stone-800 disabled:opacity-50 transition-all duration-200 cursor-pointer"
+              >
+                {creating ? '创建中...' : '创建课程'}
+              </button>
+            </div>
           </form>
         )}
 

@@ -27,10 +27,10 @@ export async function getCourse(courseId) {
   return apiRequest(`/courses/${courseId}`);
 }
 
-export async function createCourse(name) {
+export async function createCourse(name, reference = '') {
   return apiRequest('/courses', {
     method: 'POST',
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, reference }),
   });
 }
 

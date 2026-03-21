@@ -354,13 +354,19 @@ def create_course(req: CreateCourseRequest, db: Session = Depends(get_db)):
     db.flush()
 
     try:
-        syllabus_content = _strip_markdown_fences(_call_llm(SYLLABUS_PROMPT, f"课题：{req.name}"))
+        ref_section = ""
+        if req.reference.strip():
+            ref_section = f"\n\n## 参考材料（用户提供）\n\n{req.reference.strip()}"
+
+        user_msg = f"课题：{req.name}{ref_section}"
+        syllabus_content = _strip_markdown_fences(_call_llm(SYLLABUS_PROMPT, user_msg))
         syllabus = Syllabus(course_id=course.id, content=syllabus_content)
         db.add(syllabus)
         db.flush()
 
         prompt = FIRST_LESSON_PROMPT.format(syllabus=syllabus_content)
-        lesson_content = _strip_markdown_fences(_call_llm(prompt, f"请为课题「{req.name}」生成第一篇课文"))
+        lesson_user_msg = f"请为课题「{req.name}」生成第一篇课文{ref_section}"
+        lesson_content = _strip_markdown_fences(_call_llm(prompt, lesson_user_msg))
         lesson = Lesson(course_id=course.id, number=1, content=lesson_content)
         db.add(lesson)
 

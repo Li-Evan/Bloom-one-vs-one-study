@@ -1,134 +1,172 @@
-# Bloom One-vs-One Study
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="assets/logo.svg">
+    <img alt="Bloom" src="assets/logo.svg" width="360">
+  </picture>
+</p>
 
-**用 AI 模拟一对一导师，让你的学习效果提升两个标准差。**
+<p align="center">
+  <strong>Your Personal AI Tutor — Powered by the 2-Sigma Method</strong>
+</p>
 
-## 这是什么
+<p align="center">
+  <em>From average to top 2%. One lesson at a time.</em>
+</p>
 
-1984 年，教育心理学家 Benjamin Bloom 发现了一个惊人的事实：接受**一对一导师指导**的学生，平均成绩比传统课堂学生高出 **2 个标准差（+2σ）**——这意味着从班级平均水平直接跃升到**前 2%**。
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT License"></a>
+  <img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python 3.11+">
+  <img src="https://img.shields.io/badge/node-18+-blue.svg" alt="Node.js 18+">
+  <img src="https://img.shields.io/badge/react-19-blue.svg" alt="React 19">
+  <img src="https://img.shields.io/badge/fastapi-0.115+-blue.svg" alt="FastAPI">
+</p>
 
-Bloom 把这称为 **"2 Sigma Problem"**：效果已经被证明，但一对一导师太贵、太稀缺，无法规模化。
+<p align="center">
+  <a href="./README.zh.md">简体中文</a> · English
+</p>
 
-**这个项目就是对这个问题的一个回答。**
+---
 
-它不是一个 App，不是一个框架，而是一套**放在你本地的学习规则系统**。通过一份精心设计的 `Claude.md` 指令文件，它把 Claude（AI Agent）变成你的**苏格拉底式私人导师**：
+In 1984, educational psychologist Benjamin Bloom discovered that students receiving **one-on-one tutoring** scored **2 standard deviations (+2σ)** above the classroom average — jumping to the **top 2%**. Bloom called this the "2 Sigma Problem": the effect is proven, but personal tutors don't scale.
 
-- 不直接给答案，用提问引导你自己推导
-- 根据你的反馈实时调整内容深度和方向
-- 每篇文档都针对你的薄弱点定制
-- 完整的学习路径保存在本地，永不丢失
+**Bloom solves this with AI.** It generates a structured syllabus, delivers lessons one at a time, reads your annotations and feedback, then tailors the next lesson to your exact understanding level — just like a real tutor would.
 
-## 核心设计理念
+## Two Ways to Use
 
-### 学习目标固定，学习路径弹性
+| Mode | Setup | Best for |
+|------|-------|----------|
+| **CLI** | Claude Code + terminal | Power users who like Markdown editors |
+| **Web** | Browser (React + FastAPI) | Visual learners, shareable setup |
 
-每个课题有一份**课程大纲**（`syllabus.md`），定义的是"学完后你能做什么"，而不是"第几篇讲什么"。有的人 4 篇学完，有的人需要 10 篇——掌握内容不打折扣。
+Both follow the same flow: **syllabus → lesson → annotate → feedback → next lesson → evaluation → summary**.
 
-### 文档是主体，对话是辅助
+---
 
-80% 的学习通过精心设计的 Markdown 文档进行。每篇文档包含知识讲解、思考题、反馈区。对话只在衔接阶段用于确认理解状态。
+## Quick Start: CLI Mode
 
-### 自适应反馈循环
+Requires only [Claude Code](https://claude.com/claude-code). No backend.
 
-你可以在文档中任意位置用 `???[你的困惑]` 标注疑问。导师会在下一篇文档中针对性解答，并据此调整后续内容设计。
-
-### 知识持久化
-
-所有学习记录保存在你的本地文件系统。上下文长度取决于硬盘大小，不会像在线工具一样丢失历史。
-
-## 系统工作流一览
-
-```
-你说 "帮我学习 [课题名]"
-        │
-        ▼
-┌─ 生成 syllabus.md（课程大纲：你将掌握哪些能力）
-│  生成 01.md（首篇文档）
-│
-│  你阅读 → 标注 ??? → 写反馈 → 说"我读完了"
-│        │
-│        ▼
-│  导师确认理解（最多 2 轮提问）→ 生成下一篇
-│  （续篇开头：思考题复盘 → ??? 解答 → 新内容）
-│        │
-│        ▼
-│  重复，直到大纲所有掌握项全部达成 ✅
-│        │
-│        ▼
-│  生成评估篇（无新内容，最终确认）
-│        │
-│        ▼
-└─ 自动生成 summary.md（知识图谱 + 大纲复盘 + 遗留问题）
+```bash
+git clone https://github.com/Li-Evan/Bloom-one-vs-one-study.git
+cd Bloom-one-vs-one-study
+claude
 ```
 
-## 示例课题
+Then say: `开一个新的文件夹，帮助我学习 [any topic]`
 
-仓库内附带了 **10 个跨学科示例课题**，每个都包含完整的课程大纲（`syllabus.md`）和首篇文档（`01.md`），让你直接体验系统的运作方式。
+See [GUIDE.md](./GUIDE.md) for the full walkthrough.
 
-> 这些示例是预生成的起点。克隆仓库后，你可以直接阅读任意一个 `01.md`，在文中标注 `???`、写下反馈，然后让 AI 导师为你生成个性化的后续文档。当然，你也可以完全忽略它们，从零开始自己的课题。
+## Quick Start: Web Mode
 
-| 课题 | 学科 | 你将学到什么 |
-|------|------|------------|
-| [博弈论](./博弈论/) | 数学/经济学 | 囚徒困境、纳什均衡、重复博弈、机制设计 |
-| [认知偏误](./认知偏误/) | 认知科学 | 系统1/2、锚定效应、确认偏误、损失厌恶 |
-| [密码学](./密码学/) | 计算机科学 | 对称/非对称加密、哈希函数、数字签名、零知识证明 |
-| [概率论直觉](./概率论直觉/) | 数学/统计 | 贝叶斯定理、蒙提霍尔问题、赌徒谬误、辛普森悖论 |
-| [哲学思想实验](./哲学思想实验/) | 哲学 | 电车难题、缸中之脑、中文房间、自由意志 |
-| [天体物理](./天体物理/) | 物理/天文 | 恒星生命周期、黑洞、暗物质、宇宙终极命运 |
-| [说服心理学](./说服心理学/) | 心理学 | Cialdini 六大原则、框架效应、认知失调 |
-| [混沌与复杂系统](./混沌与复杂系统/) | 复杂科学 | 蝴蝶效应、分形、涌现、自组织临界 |
-| [经济学思维](./经济学思维/) | 经济学 | 机会成本、边际分析、外部性、激励设计 |
-| [进化论](./进化论/) | 生物学 | 自然选择、性选择、亲缘利他、错配假说 |
+### Prerequisites
 
-## 文件结构
+- Python 3.11+ with [uv](https://docs.astral.sh/uv/)
+- Node.js 18+
+- [DashScope API Key](https://dashscope.console.aliyun.com/) (Alibaba Cloud)
 
-```
-Bloom-one-vs-one-study/
-├── Claude.md                    # 系统指令（核心）
-├── README.md                    # 本文件
-├── GUIDE.md                     # 安装与使用指南
-├── learning-log.jsonl           # 学习日志（自动追加）
-│
-├── 博弈论/                       # ← 示例课题（10个）
-│   ├── syllabus.md              # 课程大纲
-│   └── 01.md                    # 首篇（你可以直接从这里开始）
-├── 认知偏误/
-├── 密码学/
-├── 概率论直觉/
-├── 哲学思想实验/
-├── 天体物理/
-├── 说服心理学/
-├── 混沌与复杂系统/
-├── 经济学思维/
-├── 进化论/
-│
-└── 你想学的任何东西/             # ← 自己创建新课题
-    ├── syllabus.md
-    ├── 01.md
-    ├── 02.md ...
-    └── summary.md
+### Setup
+
+```bash
+git clone https://github.com/Li-Evan/Bloom-one-vs-one-study.git
+cd Bloom-one-vs-one-study
+
+# Configure
+cp .env.example .env
+# Edit .env — fill in DASHSCOPE_API_KEY
+
+# Backend
+cd backend && uv sync && uv run uvicorn app.main:app --reload --port 8000
+
+# Frontend (new terminal)
+cd frontend && npm install && npm run dev
 ```
 
-## 适合谁
+Open http://localhost:5173. Click **New Course**, enter a topic (optionally paste reference material), and start learning.
 
-- 想系统学习一个新领域，而不是碎片化刷内容的人
-- 习惯自学但缺少反馈和纠正的人
-- 希望学习过程有记录、可追溯、可回顾的人
-- 任何能使用 Claude Code 的人
+### Docker
 
-## 快速开始
+```bash
+cp .env.example .env   # fill in API key
+docker compose up -d   # visit http://localhost:3000
+```
 
-详见 **[GUIDE.md](./GUIDE.md)**，5 分钟完成安装，开始你的第一个课题。
+---
 
-## 背后的理论
+## How It Works
 
-| 概念 | 说明 |
-|------|------|
-| **Bloom 2 Sigma** | 一对一导师 vs 传统课堂 = +2σ 的成绩提升 |
-| **掌握学习法** | 确保每个知识点都被真正掌握后再推进 |
-| **苏格拉底式教学** | 不直接告诉答案，用提问引导学生自己发现 |
-| **间隔反馈** | 每篇文档的思考题复盘强化记忆 |
-| **自适应路径** | 根据个体反馈动态调整学习内容和节奏 |
+```
+Create course → AI generates syllabus + lesson 01
+                        ↓
+        Read lesson → highlight text → add ??? annotations
+                        ↓
+        Write feedback → answer thought questions
+                        ↓
+        Click "Done Reading" → AI generates next lesson
+        (includes: review of your answers + ??? responses + new content)
+                        ↓
+        Repeat until all mastery items checked ✅
+                        ↓
+        Auto-generate evaluation → then summary
+```
 
-## 许可
+## Features
 
-MIT License — 自由使用、修改、分享。
+- **Reference material** — paste textbook chapters, papers, or notes when creating a course; AI uses them to shape the curriculum
+- **Inline annotations** — select any text and add `???` confusion markers
+- **Adaptive lessons** — each lesson addresses your specific gaps from the previous one
+- **Chapter sidebar** — quick-jump between lessons while reading
+- **Collapsible syllabus** — track mastery progress without clutter
+- **Streaming generation** — watch AI write the next lesson in real-time
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Backend | Python, FastAPI, SQLAlchemy, SQLite |
+| Frontend | React, Vite, Tailwind CSS |
+| AI | DashScope API (OpenAI-compatible) |
+| Container | Docker, docker-compose |
+| Font | Outfit, JetBrains Mono |
+
+## Commands
+
+```bash
+make dev-backend      # backend with hot reload
+make dev-frontend     # frontend dev server
+make test             # run pytest
+make up / make down   # docker start / stop
+```
+
+## Project Structure
+
+```
+├── Claude.md              # AI tutor instructions (CLI mode)
+├── GUIDE.md               # CLI usage guide
+├── .env.example           # env template
+├── backend/
+│   └── app/
+│       ├── courses.py     # all API routes + AI prompt logic
+│       ├── models.py      # Course, Lesson, Annotation, Feedback
+│       └── config.py      # reads .env
+├── frontend/
+│   └── src/pages/
+│       ├── DashboardPage  # course list + create form
+│       ├── CoursePage     # syllabus + lesson list
+│       └── LessonPage     # reader + annotations + feedback + AI gen
+└── example/               # pre-built topics for CLI mode
+```
+
+## The Science
+
+| Concept | What it means |
+|---------|--------------|
+| **Bloom's 2 Sigma** | 1-on-1 tutoring = +2σ performance over classroom |
+| **Mastery Learning** | Don't move on until the concept is truly understood |
+| **Socratic Method** | Ask questions, don't hand answers |
+| **Spaced Retrieval** | Thought question reviews at lesson start reinforce memory |
+| **Adaptive Path** | Content adjusts to individual feedback in real-time |
+
+## License
+
+[MIT](LICENSE)
