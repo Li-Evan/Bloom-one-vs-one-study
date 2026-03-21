@@ -7,7 +7,7 @@ from app.config import settings
 from app.database import engine, Base
 from app.auth import router as auth_router
 from app.credits import router as credits_router
-from app.chat import router as chat_router
+from app.courses import router as courses_router
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -24,7 +24,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(credits_router)
-app.include_router(chat_router)
+app.include_router(courses_router)
 
 
 @app.get("/api/health")
