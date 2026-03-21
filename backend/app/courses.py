@@ -8,9 +8,7 @@ from openai import OpenAI
 
 from app.config import settings
 from app.database import get_db
-from app.models import User, Course, Syllabus, Lesson, Annotation, Feedback
-from app.auth import get_current_user
-from app.credits import deduct_credits, refund_credits
+from app.models import Course, Syllabus, Lesson, Annotation, Feedback
 from app.schemas import (
     CreateCourseRequest, CourseResponse, CourseDetailResponse,
     SyllabusResponse, SyllabusUpdateRequest,
@@ -349,27 +347,18 @@ def _check_all_mastery_items_done(syllabus_content: str) -> bool:
 # ---------------------------------------------------------------------------
 
 @router.post("/courses", response_model=CourseDetailResponse)
-def create_course(
-    req: CreateCourseRequest,
-    user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
+def create_course(req: CreateCourseRequest, db: Session = Depends(get_db)):
     """Create course + AI generates syllabus + first lesson (blocking)."""
-    if not deduct_credits(db, user.id, settings.CREDITS_PER_REQUEST, f"创建课程「{req.name}」"):
-        raise HTTPException(status_code=402, detail="积分不足")
-
-    course = Course(user_id=user.id, name=req.name, status="learning")
+    course = Course(name=req.name, status="learning")
     db.add(course)
     db.flush()
 
     try:
-        # Generate syllabus
         syllabus_content = _strip_markdown_fences(_call_llm(SYLLABUS_PROMPT, f"课题：{req.name}"))
         syllabus = Syllabus(course_id=course.id, content=syllabus_content)
         db.add(syllabus)
         db.flush()
 
-        # Generate first lesson
         prompt = FIRST_LESSON_PROMPT.format(syllabus=syllabus_content)
         lesson_content = _strip_markdown_fences(_call_llm(prompt, f"请为课题「{req.name}」生成第一篇课文"))
         lesson = Lesson(course_id=course.id, number=1, content=lesson_content)
@@ -383,18 +372,15 @@ def create_course(
             created_at=course.created_at, lesson_count=1,
             syllabus_content=syllabus_content,
         )
-
     except Exception as e:
         logger.exception("Course creation error")
         db.rollback()
-        refund_credits(db, user.id, settings.CREDITS_PER_REQUEST, "退款：课程创建失败")
-        db.commit()
         raise HTTPException(status_code=500, detail="课程创建失败，请稍后重试")
 
 
 @router.get("/courses", response_model=list[CourseResponse])
-def list_courses(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    courses = db.query(Course).filter(Course.user_id == user.id).order_by(Course.created_at.desc()).all()
+def list_courses(db: Session = Depends(get_db)):
+    courses = db.query(Course).order_by(Course.created_at.desc()).all()
     return [
         CourseResponse(
             id=c.id, name=c.name, status=c.status,
@@ -405,8 +391,8 @@ def list_courses(user: User = Depends(get_current_user), db: Session = Depends(g
 
 
 @router.get("/courses/{course_id}", response_model=CourseDetailResponse)
-def get_course(course_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    course = db.query(Course).filter(Course.id == course_id, Course.user_id == user.id).first()
+def get_course(course_id: int, db: Session = Depends(get_db)):
+    course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
     return CourseDetailResponse(
@@ -417,8 +403,8 @@ def get_course(course_id: int, user: User = Depends(get_current_user), db: Sessi
 
 
 @router.get("/courses/{course_id}/syllabus", response_model=SyllabusResponse)
-def get_syllabus(course_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    course = db.query(Course).filter(Course.id == course_id, Course.user_id == user.id).first()
+def get_syllabus(course_id: int, db: Session = Depends(get_db)):
+    course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
     if not course.syllabus:
@@ -430,10 +416,9 @@ def get_syllabus(course_id: int, user: User = Depends(get_current_user), db: Ses
 def update_syllabus(
     course_id: int,
     req: SyllabusUpdateRequest,
-    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    course = db.query(Course).filter(Course.id == course_id, Course.user_id == user.id).first()
+    course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
     if not course.syllabus:
@@ -445,8 +430,8 @@ def update_syllabus(
 
 
 @router.get("/courses/{course_id}/lessons", response_model=list[LessonListItem])
-def list_lessons(course_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    course = db.query(Course).filter(Course.id == course_id, Course.user_id == user.id).first()
+def list_lessons(course_id: int, db: Session = Depends(get_db)):
+    course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
     return [
@@ -456,8 +441,8 @@ def list_lessons(course_id: int, user: User = Depends(get_current_user), db: Ses
 
 
 @router.get("/courses/{course_id}/lessons/{lesson_num}", response_model=LessonResponse)
-def get_lesson(course_id: int, lesson_num: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    course = db.query(Course).filter(Course.id == course_id, Course.user_id == user.id).first()
+def get_lesson(course_id: int, lesson_num: int, db: Session = Depends(get_db)):
+    course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
     lesson = db.query(Lesson).filter(Lesson.course_id == course_id, Lesson.number == lesson_num).first()
@@ -471,10 +456,9 @@ def create_annotation(
     course_id: int,
     lesson_num: int,
     req: CreateAnnotationRequest,
-    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    course = db.query(Course).filter(Course.id == course_id, Course.user_id == user.id).first()
+    course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
     lesson = db.query(Lesson).filter(Lesson.course_id == course_id, Lesson.number == lesson_num).first()
@@ -483,7 +467,6 @@ def create_annotation(
 
     annotation = Annotation(
         lesson_id=lesson.id,
-        user_id=user.id,
         position_start=req.position_start,
         position_end=req.position_end,
         original_text=req.original_text,
@@ -499,10 +482,9 @@ def create_annotation(
 def get_annotations(
     course_id: int,
     lesson_num: int,
-    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    course = db.query(Course).filter(Course.id == course_id, Course.user_id == user.id).first()
+    course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
     lesson = db.query(Lesson).filter(Lesson.course_id == course_id, Lesson.number == lesson_num).first()
@@ -516,10 +498,9 @@ def create_feedback(
     course_id: int,
     lesson_num: int,
     req: CreateFeedbackRequest,
-    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    course = db.query(Course).filter(Course.id == course_id, Course.user_id == user.id).first()
+    course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
     lesson = db.query(Lesson).filter(Lesson.course_id == course_id, Lesson.number == lesson_num).first()
@@ -527,7 +508,7 @@ def create_feedback(
         raise HTTPException(status_code=404, detail="课文不存在")
 
     # Check if feedback already exists, update if so
-    existing = db.query(Feedback).filter(Feedback.lesson_id == lesson.id, Feedback.user_id == user.id).first()
+    existing = db.query(Feedback).filter(Feedback.lesson_id == lesson.id).first()
     if existing:
         existing.content = req.content
         existing.thought_answers = req.thought_answers
@@ -537,7 +518,6 @@ def create_feedback(
 
     feedback = Feedback(
         lesson_id=lesson.id,
-        user_id=user.id,
         content=req.content,
         thought_answers=req.thought_answers,
     )
@@ -550,21 +530,16 @@ def create_feedback(
 @router.post("/courses/{course_id}/next")
 def generate_next_lesson(
     course_id: int,
-    user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """'我读完了' → AI generates next lesson (SSE streaming)."""
-    course = db.query(Course).filter(Course.id == course_id, Course.user_id == user.id).first()
+    course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
     if course.status == "completed":
         raise HTTPException(status_code=400, detail="课程已完结")
     if not course.syllabus:
         raise HTTPException(status_code=400, detail="课程大纲尚未生成")
-
-    if not deduct_credits(db, user.id, settings.CREDITS_PER_REQUEST, f"课程「{course.name}」生成课文"):
-        raise HTTPException(status_code=402, detail="积分不足")
-    db.commit()
 
     lessons = course.lessons
     if not lessons:
@@ -574,14 +549,14 @@ def generate_next_lesson(
 
     # Check if last lesson is an evaluation article — if so, generate summary
     if last_lesson.is_evaluation:
-        return _generate_summary_response(course, user.id, db)
+        return _generate_summary_response(course, db)
 
     syllabus_content = course.syllabus.content
     all_mastery_done = _check_all_mastery_items_done(syllabus_content)
 
     # Collect feedback and annotations from last lesson
     last_feedback = db.query(Feedback).filter(
-        Feedback.lesson_id == last_lesson.id, Feedback.user_id == user.id
+        Feedback.lesson_id == last_lesson.id
     ).first()
     last_annotations = db.query(Annotation).filter(
         Annotation.lesson_id == last_lesson.id
@@ -626,7 +601,6 @@ def generate_next_lesson(
         user_msg = f"生成第{next_number}篇课文"
 
     cid = course.id
-    uid = user.id
 
     def generate():
         try:
@@ -653,17 +627,12 @@ def generate_next_lesson(
         except Exception as e:
             logger.exception("Next lesson generation error")
             db.rollback()
-            try:
-                refund_credits(db, uid, settings.CREDITS_PER_REQUEST, "退款：课文生成失败")
-                db.commit()
-            except Exception:
-                logger.exception("Failed to refund credits")
             yield f"data: {json.dumps({'error': '服务暂时不可用，请稍后重试'}, ensure_ascii=False)}\n\n"
 
     return StreamingResponse(generate(), media_type="text/event-stream")
 
 
-def _generate_summary_response(course: Course, user_id: int, db: Session):
+def _generate_summary_response(course: Course, db: Session):
     """Generate summary after evaluation article is read."""
     syllabus_content = course.syllabus.content
     all_lessons_text = "\n\n---\n\n".join(
@@ -706,8 +675,8 @@ def _generate_summary_response(course: Course, user_id: int, db: Session):
 
 
 @router.get("/courses/{course_id}/summary")
-def get_summary(course_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    course = db.query(Course).filter(Course.id == course_id, Course.user_id == user.id).first()
+def get_summary(course_id: int, db: Session = Depends(get_db)):
+    course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
     # Summary is stored as lesson number 0

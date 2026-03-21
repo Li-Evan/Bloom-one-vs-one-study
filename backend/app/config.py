@@ -1,27 +1,13 @@
 import os
-import sys
 from dotenv import load_dotenv
 
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env"))
 
-_INSECURE_JWT_DEFAULTS = {
-    "change-me", "change-this-to-a-random-secret-key",
-    "generate-a-strong-random-secret-here",
-    "bloom-2sigma-jwt-secret-key-change-in-production", "",
-}
-
 
 class Settings:
     DASHSCOPE_API_KEY: str = os.getenv("DASHSCOPE_API_KEY", "")
-    DASHSCOPE_BASE_URL: str = os.getenv("DASHSCOPE_BASE_URL", "https://coding.dashscope.aliyuncs.com/v1")
-    DASHSCOPE_MODEL: str = os.getenv("DASHSCOPE_MODEL", "glm-5")
-
-    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "")
-    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
-    JWT_EXPIRE_MINUTES: int = int(os.getenv("JWT_EXPIRE_MINUTES", "1440"))
-
-    DEFAULT_CREDITS: int = int(os.getenv("DEFAULT_CREDITS", "100"))
-    CREDITS_PER_REQUEST: int = int(os.getenv("CREDITS_PER_REQUEST", "1"))
+    DASHSCOPE_BASE_URL: str = os.getenv("DASHSCOPE_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1")
+    DASHSCOPE_MODEL: str = os.getenv("DASHSCOPE_MODEL", "qwen-plus")
 
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./bloom.db")
 
@@ -31,16 +17,5 @@ class Settings:
 
     TESTING: bool = os.getenv("TESTING", "").lower() in ("1", "true", "yes")
 
-    def validate(self):
-        if not self.TESTING:
-            if self.JWT_SECRET_KEY in _INSECURE_JWT_DEFAULTS or len(self.JWT_SECRET_KEY) < 32:
-                print(
-                    "FATAL: JWT_SECRET_KEY is not set, uses an insecure default, or is too short (min 32 chars). "
-                    "Generate one with: python -c \"import secrets; print(secrets.token_urlsafe(32))\"",
-                    file=sys.stderr,
-                )
-                sys.exit(1)
-
 
 settings = Settings()
-settings.validate()

@@ -63,18 +63,18 @@ export default function CoursePage() {
   return (
     <div className="min-h-[100dvh] bg-stone-50">
       {/* Header */}
-      <header className="bg-white border-b border-stone-200/60 sticky top-0 z-10">
+      <header className="bg-stone-900 sticky top-0 z-10">
         <div className="max-w-[720px] mx-auto px-6 py-3.5 flex items-center justify-between">
           <button
             onClick={() => navigate('/')}
-            className="text-stone-400 hover:text-stone-700 text-sm transition-colors flex items-center gap-1.5"
+            className="text-stone-400 hover:text-white text-sm transition-colors flex items-center gap-1.5"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
             返回
           </button>
-          <span className="text-xs text-stone-400 font-mono">
+          <span className="text-xs text-stone-500 font-mono">
             {isCompleted ? 'COMPLETED' : 'IN PROGRESS'}
           </span>
         </div>

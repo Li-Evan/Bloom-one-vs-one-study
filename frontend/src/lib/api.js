@@ -1,20 +1,10 @@
 const API_BASE = '/api';
 
-function getToken() {
-  return localStorage.getItem('token');
-}
-
-function authHeaders() {
-  const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 export async function apiRequest(path, options = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...authHeaders(),
       ...options.headers,
     },
   });
@@ -25,44 +15,6 @@ export async function apiRequest(path, options = {}) {
   }
 
   return res.json();
-}
-
-// --- Auth ---
-
-export async function register(email, username, password) {
-  const data = await apiRequest('/auth/register', {
-    method: 'POST',
-    body: JSON.stringify({ email, username, password }),
-  });
-  localStorage.setItem('token', data.access_token);
-  return data;
-}
-
-export async function login(email, password) {
-  const data = await apiRequest('/auth/login', {
-    method: 'POST',
-    body: JSON.stringify({ email, password }),
-  });
-  localStorage.setItem('token', data.access_token);
-  return data;
-}
-
-export async function getMe() {
-  return apiRequest('/auth/me');
-}
-
-export function logout() {
-  localStorage.removeItem('token');
-}
-
-// --- Credits ---
-
-export async function getBalance() {
-  return apiRequest('/credits/balance');
-}
-
-export async function getCreditHistory() {
-  return apiRequest('/credits/history');
 }
 
 // --- Courses ---
@@ -132,10 +84,7 @@ export async function submitFeedback(courseId, lessonNum, content, thoughtAnswer
 export async function generateNextLesson(courseId, onChunk, onDone) {
   const res = await fetch(`${API_BASE}/courses/${courseId}/next`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      ...authHeaders(),
-    },
+    headers: { 'Content-Type': 'application/json' },
   });
 
   if (!res.ok) {

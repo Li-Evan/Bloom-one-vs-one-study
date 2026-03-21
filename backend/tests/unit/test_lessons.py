@@ -24,7 +24,7 @@ def _make_mock_stream(content_chunks):
     return iter(chunks)
 
 
-def _setup_course(auth_client, syllabus_content=None):
+def _setup_course(client, syllabus_content=None):
     """Create a course with mocked LLM, return course_id."""
     if syllabus_content is None:
         syllabus_content = "# 测试 · 课程大纲\n\n## 核心掌握项\n\n### 模块一\n- [ ] 能够解释概念"
@@ -35,17 +35,17 @@ def _setup_course(auth_client, syllabus_content=None):
         mock_client = MagicMock()
         mock_client.chat.completions.create.side_effect = [syllabus_resp, lesson_resp]
         mock_get_client.return_value = mock_client
-        data = auth_client.post("/api/courses", json={"name": "测试课程"}).json()
+        data = client.post("/api/courses", json={"name": "测试课程"}).json()
 
     return data["id"]
 
 
 # --- Annotation Tests ---
 
-def test_create_annotation(auth_client):
-    course_id = _setup_course(auth_client)
+def test_create_annotation(client):
+    course_id = _setup_course(client)
 
-    res = auth_client.post(f"/api/courses/{course_id}/lessons/1/annotations", json={
+    res = client.post(f"/api/courses/{course_id}/lessons/1/annotations", json={
         "position_start": 10,
         "position_end": 20,
         "original_text": "正文",
@@ -59,34 +59,34 @@ def test_create_annotation(auth_client):
     assert data["position_end"] == 20
 
 
-def test_get_annotations(auth_client):
-    course_id = _setup_course(auth_client)
+def test_get_annotations(client):
+    course_id = _setup_course(client)
 
-    auth_client.post(f"/api/courses/{course_id}/lessons/1/annotations", json={
+    client.post(f"/api/courses/{course_id}/lessons/1/annotations", json={
         "position_start": 0, "position_end": 5, "original_text": "文本1", "comment": "???为什么",
     })
-    auth_client.post(f"/api/courses/{course_id}/lessons/1/annotations", json={
+    client.post(f"/api/courses/{course_id}/lessons/1/annotations", json={
         "position_start": 10, "position_end": 15, "original_text": "文本2", "comment": "???不懂",
     })
 
-    res = auth_client.get(f"/api/courses/{course_id}/lessons/1/annotations")
+    res = client.get(f"/api/courses/{course_id}/lessons/1/annotations")
     assert res.status_code == 200
     annotations = res.json()
     assert len(annotations) == 2
 
 
-def test_annotation_nonexistent_lesson(auth_client):
-    course_id = _setup_course(auth_client)
-    res = auth_client.post(f"/api/courses/{course_id}/lessons/99/annotations", json={
+def test_annotation_nonexistent_lesson(client):
+    course_id = _setup_course(client)
+    res = client.post(f"/api/courses/{course_id}/lessons/99/annotations", json={
         "position_start": 0, "position_end": 5, "original_text": "text", "comment": "comment",
     })
     assert res.status_code == 404
 
 
-def test_annotation_invalid_positions(auth_client):
+def test_annotation_invalid_positions(client):
     """position_end < position_start should be rejected."""
-    course_id = _setup_course(auth_client)
-    res = auth_client.post(f"/api/courses/{course_id}/lessons/1/annotations", json={
+    course_id = _setup_course(client)
+    res = client.post(f"/api/courses/{course_id}/lessons/1/annotations", json={
         "position_start": 20,
         "position_end": 5,
         "original_text": "text",
@@ -97,10 +97,10 @@ def test_annotation_invalid_positions(auth_client):
 
 # --- Feedback Tests ---
 
-def test_create_feedback(auth_client):
-    course_id = _setup_course(auth_client)
+def test_create_feedback(client):
+    course_id = _setup_course(client)
 
-    res = auth_client.post(f"/api/courses/{course_id}/lessons/1/feedback", json={
+    res = client.post(f"/api/courses/{course_id}/lessons/1/feedback", json={
         "content": "这一章讲得很好，但第二个概念还是不太清楚",
         "thought_answers": '{"q1": "我的答案是..."}',
     })
@@ -109,15 +109,15 @@ def test_create_feedback(auth_client):
     assert "不太清楚" in data["content"]
 
 
-def test_update_feedback(auth_client):
+def test_update_feedback(client):
     """Submitting feedback twice should update, not duplicate."""
-    course_id = _setup_course(auth_client)
+    course_id = _setup_course(client)
 
-    auth_client.post(f"/api/courses/{course_id}/lessons/1/feedback", json={
+    client.post(f"/api/courses/{course_id}/lessons/1/feedback", json={
         "content": "初始反馈",
         "thought_answers": "",
     })
-    res = auth_client.post(f"/api/courses/{course_id}/lessons/1/feedback", json={
+    res = client.post(f"/api/courses/{course_id}/lessons/1/feedback", json={
         "content": "更新后的反馈",
         "thought_answers": '{"q1": "更新答案"}',
     })
@@ -125,18 +125,18 @@ def test_update_feedback(auth_client):
     assert res.json()["content"] == "更新后的反馈"
 
 
-def test_feedback_nonexistent_lesson(auth_client):
-    course_id = _setup_course(auth_client)
-    res = auth_client.post(f"/api/courses/{course_id}/lessons/99/feedback", json={
+def test_feedback_nonexistent_lesson(client):
+    course_id = _setup_course(client)
+    res = client.post(f"/api/courses/{course_id}/lessons/99/feedback", json={
         "content": "test", "thought_answers": "",
     })
     assert res.status_code == 404
 
 
-def test_feedback_plain_text_thought_answers(auth_client):
+def test_feedback_plain_text_thought_answers(client):
     """thought_answers accepts plain text (not just JSON)."""
-    course_id = _setup_course(auth_client)
-    res = auth_client.post(f"/api/courses/{course_id}/lessons/1/feedback", json={
+    course_id = _setup_course(client)
+    res = client.post(f"/api/courses/{course_id}/lessons/1/feedback", json={
         "content": "反馈",
         "thought_answers": "第1题：我觉得答案是X\n第2题：答案是Y",
     })
@@ -145,11 +145,11 @@ def test_feedback_plain_text_thought_answers(auth_client):
 
 # --- Generate Next Lesson Tests ---
 
-def test_generate_next_lesson(auth_client):
-    course_id = _setup_course(auth_client)
+def test_generate_next_lesson(client):
+    course_id = _setup_course(client)
 
     # Submit feedback first
-    auth_client.post(f"/api/courses/{course_id}/lessons/1/feedback", json={
+    client.post(f"/api/courses/{course_id}/lessons/1/feedback", json={
         "content": "我理解了基本概念",
         "thought_answers": '{"q1": "答案"}',
     })
@@ -161,25 +161,20 @@ def test_generate_next_lesson(auth_client):
         mock_client.chat.completions.create.return_value = next_stream
         mock_get_client.return_value = mock_client
 
-        res = auth_client.post(f"/api/courses/{course_id}/next")
+        res = client.post(f"/api/courses/{course_id}/next")
         assert res.status_code == 200
         assert "text/event-stream" in res.headers["content-type"]
         body = res.text
         assert '"done": true' in body
 
     # Verify new lesson exists
-    lessons = auth_client.get(f"/api/courses/{course_id}/lessons").json()
+    lessons = client.get(f"/api/courses/{course_id}/lessons").json()
     assert len(lessons) == 2
     assert lessons[1]["number"] == 2
 
 
-def test_generate_next_no_auth(client):
-    res = client.post("/api/courses/1/next")
-    assert res.status_code in (401, 403)
-
-
-def test_generate_next_completed_course(auth_client):
-    course_id = _setup_course(auth_client)
+def test_generate_next_completed_course(client):
+    course_id = _setup_course(client)
 
     from sqlalchemy import update
     from app.models import Course
@@ -188,18 +183,18 @@ def test_generate_next_completed_course(auth_client):
         db.execute(update(Course).where(Course.id == course_id).values(status="completed"))
         db.commit()
 
-    res = auth_client.post(f"/api/courses/{course_id}/next")
+    res = client.post(f"/api/courses/{course_id}/next")
     assert res.status_code == 400
     assert "已完结" in res.json()["detail"]
 
 
-def test_generate_eval_when_all_mastery_done(auth_client):
+def test_generate_eval_when_all_mastery_done(client):
     """When all syllabus items are checked, next should generate eval article."""
     all_checked = "# 测试 · 课程大纲\n\n## 核心掌握项\n\n### 模块一\n- [x] 能够解释概念"
-    course_id = _setup_course(auth_client, syllabus_content=all_checked)
+    course_id = _setup_course(client, syllabus_content=all_checked)
 
     # Update syllabus to all-checked
-    auth_client.put(f"/api/courses/{course_id}/syllabus", json={"content": all_checked})
+    client.put(f"/api/courses/{course_id}/syllabus", json={"content": all_checked})
 
     eval_stream = _make_mock_stream(["<!-- eval-article -->\n\n# 最终评估\n\n评估内容"])
 
@@ -208,28 +203,28 @@ def test_generate_eval_when_all_mastery_done(auth_client):
         mock_client.chat.completions.create.return_value = eval_stream
         mock_get_client.return_value = mock_client
 
-        res = auth_client.post(f"/api/courses/{course_id}/next")
+        res = client.post(f"/api/courses/{course_id}/next")
         assert res.status_code == 200
         body = res.text
         assert '"done": true' in body
         assert '"is_evaluation": true' in body
 
     # Verify eval lesson created
-    lessons = auth_client.get(f"/api/courses/{course_id}/lessons").json()
+    lessons = client.get(f"/api/courses/{course_id}/lessons").json()
     assert len(lessons) == 2
     assert lessons[1]["is_evaluation"] is True
 
 
-def test_get_summary_not_found(auth_client):
+def test_get_summary_not_found(client):
     """Summary should 404 when course not completed."""
-    course_id = _setup_course(auth_client)
-    res = auth_client.get(f"/api/courses/{course_id}/summary")
+    course_id = _setup_course(client)
+    res = client.get(f"/api/courses/{course_id}/summary")
     assert res.status_code == 404
 
 
-def test_summary_generation_after_eval(auth_client):
+def test_summary_generation_after_eval(client):
     """After eval article, next should generate summary and mark course completed."""
-    course_id = _setup_course(auth_client)
+    course_id = _setup_course(client)
 
     # Manually add an eval lesson
     from app.models import Lesson
@@ -249,16 +244,16 @@ def test_summary_generation_after_eval(auth_client):
         mock_client.chat.completions.create.return_value = summary_stream
         mock_get_client.return_value = mock_client
 
-        res = auth_client.post(f"/api/courses/{course_id}/next")
+        res = client.post(f"/api/courses/{course_id}/next")
         assert res.status_code == 200
         body = res.text
         assert '"done": true' in body
         assert '"completed": true' in body
 
     # Verify summary exists and course is completed
-    res = auth_client.get(f"/api/courses/{course_id}/summary")
+    res = client.get(f"/api/courses/{course_id}/summary")
     assert res.status_code == 200
     assert "总结" in res.json()["content"]
 
-    detail = auth_client.get(f"/api/courses/{course_id}").json()
+    detail = client.get(f"/api/courses/{course_id}").json()
     assert detail["status"] == "completed"

@@ -5,14 +5,12 @@ import os
 
 from app.config import settings
 from app.database import engine, Base
-from app.auth import router as auth_router
-from app.credits import router as credits_router
 from app.courses import router as courses_router
 
 # Create tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Bloom Learning API", version="0.1.0")
+app = FastAPI(title="Bloom Learning API", version="0.2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,8 +20,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth_router)
-app.include_router(credits_router)
 app.include_router(courses_router)
 
 

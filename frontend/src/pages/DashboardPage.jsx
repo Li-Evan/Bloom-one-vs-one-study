@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCourses, createCourse } from '../lib/api';
-import { useAuth } from '../lib/AuthContext';
 
 export default function DashboardPage() {
   const [courses, setCourses] = useState([]);
@@ -11,7 +10,6 @@ export default function DashboardPage() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
 
   useEffect(() => {
     getCourses()
@@ -40,27 +38,12 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-[100dvh] bg-stone-50">
-      {/* Header */}
-      <header className="bg-white border-b border-stone-200/60 sticky top-0 z-10">
+      {/* Header — dark */}
+      <header className="bg-stone-900 sticky top-0 z-10">
         <div className="max-w-[1100px] mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-base font-semibold text-stone-900 tracking-tight">Bloom</h1>
-            <span className="h-4 w-px bg-stone-200" />
-            <span className="text-sm text-stone-400">{user?.username}</span>
-          </div>
-          <div className="flex items-center gap-5">
-            <button
-              onClick={() => navigate('/credits')}
-              className="text-sm text-stone-500 hover:text-stone-700 transition-colors tabular-nums font-mono"
-            >
-              {user?.credits ?? 0} 积分
-            </button>
-            <button
-              onClick={() => { logout(); navigate('/login'); }}
-              className="text-sm text-stone-400 hover:text-rose-500 transition-colors"
-            >
-              退出
-            </button>
+            <h1 className="text-base font-semibold text-white tracking-tight">Bloom</h1>
+            <span className="text-stone-600 text-xs font-mono">2-Sigma Learning</span>
           </div>
         </div>
       </header>
