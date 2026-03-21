@@ -130,11 +130,11 @@ Bloom-one-vs-one-study/
 ### 对话流程（`/api/chat/send`）
 
 1. 验证用户认证 + 课程归属
-2. 检查积分余额 >= 1
+2. 原子化扣除积分（SQL WHERE 条件确保余额充足，防竞态）
 3. 保存用户消息到 DB
 4. 构建对话历史（system prompt + 历史消息）
 5. 调用 DashScope API（流式），逐 chunk 通过 SSE 返回给前端
-6. 流结束后：保存 AI 回复 + 扣除积分 + commit
+6. 流结束后：保存 AI 回复到 DB
 7. 前端通过 `onChunk` 回调实时渲染
 
 ### 认证流程
@@ -152,7 +152,7 @@ Bloom-one-vs-one-study/
 | `DASHSCOPE_API_KEY` | — | 阿里百炼 API 密钥（必填） |
 | `DASHSCOPE_BASE_URL` | `https://coding.dashscope.aliyuncs.com/v1` | API 地址 |
 | `DASHSCOPE_MODEL` | `glm-5` | 模型名称 |
-| `JWT_SECRET_KEY` | `change-me` | JWT 密钥（生产必改） |
+| `JWT_SECRET_KEY` | `""`（空字符串） | JWT 密钥（必填，启动时校验，不安全值会拒绝启动） |
 | `JWT_EXPIRE_MINUTES` | `1440` | Token 有效期（分钟） |
 | `DEFAULT_CREDITS` | `100` | 注册赠送积分 |
 | `CREDITS_PER_REQUEST` | `1` | 每次对话消耗积分 |

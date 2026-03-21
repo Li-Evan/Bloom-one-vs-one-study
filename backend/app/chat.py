@@ -81,7 +81,7 @@ def send_message(req: ChatRequest, user: User = Depends(get_current_user), db: S
 
     # Atomically deduct credits BEFORE calling the LLM — eliminates race condition
     if not deduct_credits(db, user.id, settings.CREDITS_PER_REQUEST, f"课程「{course.name}」对话"):
-        raise HTTPException(status_code=402, detail=f"积分不足，当前余额 {user.credits}")
+        raise HTTPException(status_code=402, detail="积分不足")
     db.commit()
 
     # Save user message
@@ -110,7 +110,7 @@ def send_message(req: ChatRequest, user: User = Depends(get_current_user), db: S
                 if chunk.choices and chunk.choices[0].delta.content:
                     content = chunk.choices[0].delta.content
                     full_response += content
-                    yield f"data: {json.dumps({'content': content})}\n\n"
+                    yield f"data: {json.dumps(ensure_ascii=False, obj={'content': content})}\n\n"
 
             # Save assistant message
             with SessionLocal() as gen_db:
@@ -118,9 +118,9 @@ def send_message(req: ChatRequest, user: User = Depends(get_current_user), db: S
                 gen_db.add(assistant_msg)
                 gen_db.commit()
 
-            yield f"data: {json.dumps({'done': True})}\n\n"
+            yield f"data: {json.dumps(ensure_ascii=False, obj={'done': True})}\n\n"
         except Exception as e:
             logger.exception("Chat stream error")
-            yield f"data: {json.dumps({'error': '服务暂时不可用，请稍后重试'})}\n\n"
+            yield f"data: {json.dumps(ensure_ascii=False, obj={'error': '服务暂时不可用，请稍后重试'})}\n\n"
 
     return StreamingResponse(generate(), media_type="text/event-stream")

@@ -23,3 +23,14 @@
 - 修复 auth.py 中 `pwd_context` 未定义导致注册/登录全部失败的 bug
 - 修复 `/api/health` 端点被 static files mount 拦截返回 404 的问题
 - 修正测试中无认证请求状态码断言（401 vs 403 兼容）
+- 修复 config.py JWT 安全校验遗漏 `.env.example` 默认值 `generate-a-strong-random-secret-here`
+- 修复 chat.py 积分不足错误信息引用 stale ORM 数据的问题
+- 修复 ARCHITECTURE.md 文档与代码不一致（积分扣除时机、JWT 默认值）
+- 移除 pyproject.toml 中已不使用的 passlib 依赖
+- SSE 流式输出改用 `ensure_ascii=False`，正确显示中文字符
+
+### 测试
+- 新增 POST `/api/chat/send` 端点的 mocked 测试（SSE 流式、LLM 调用参数、积分扣除）
+- 新增 `deduct_credits()` 边界测试：余额不足、精确余额、扣除成功
+- 新增积分不足场景的 402 状态码测试
+- 测试总数：23 个（原 16 个 + 新增 7 个），全部通过

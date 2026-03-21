@@ -4,7 +4,11 @@ from dotenv import load_dotenv
 
 load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env"))
 
-_INSECURE_JWT_DEFAULTS = {"change-me", "change-this-to-a-random-secret-key", ""}
+_INSECURE_JWT_DEFAULTS = {
+    "change-me", "change-this-to-a-random-secret-key",
+    "generate-a-strong-random-secret-here",
+    "bloom-2sigma-jwt-secret-key-change-in-production", "",
+}
 
 
 class Settings:
@@ -28,13 +32,14 @@ class Settings:
     TESTING: bool = os.getenv("TESTING", "").lower() in ("1", "true", "yes")
 
     def validate(self):
-        if not self.TESTING and self.JWT_SECRET_KEY in _INSECURE_JWT_DEFAULTS:
-            print(
-                "FATAL: JWT_SECRET_KEY is not set or uses an insecure default. "
-                "Set a strong secret in .env before starting the server.",
-                file=sys.stderr,
-            )
-            sys.exit(1)
+        if not self.TESTING:
+            if self.JWT_SECRET_KEY in _INSECURE_JWT_DEFAULTS or len(self.JWT_SECRET_KEY) < 32:
+                print(
+                    "FATAL: JWT_SECRET_KEY is not set, uses an insecure default, or is too short (min 32 chars). "
+                    "Generate one with: python -c \"import secrets; print(secrets.token_urlsafe(32))\"",
+                    file=sys.stderr,
+                )
+                sys.exit(1)
 
 
 settings = Settings()
