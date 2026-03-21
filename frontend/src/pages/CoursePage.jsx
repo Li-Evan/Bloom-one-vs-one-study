@@ -117,6 +117,24 @@ export default function CoursePage() {
               {new Date(course.created_at).toLocaleDateString('zh-CN')}
             </span>
           </div>
+
+          {/* Mastery progress bar */}
+          {course.mastery_progress !== undefined && (
+            <div className="mt-4">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-stone-400">掌握进度</span>
+                <span className="text-xs font-mono tabular-nums text-stone-500">
+                  {Math.round(course.mastery_progress * 100)}%
+                </span>
+              </div>
+              <div className="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.round(course.mastery_progress * 100)}%` }}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Lesson list (syllabus as first item) */}
@@ -167,13 +185,18 @@ export default function CoursePage() {
                     <span className="w-10 h-10 rounded-xl bg-stone-900 flex items-center justify-center text-xs font-mono text-white font-medium shrink-0">
                       {String(lesson.number).padStart(2, '0')}
                     </span>
-                    <div>
-                      <span className="font-medium text-stone-700 text-sm group-hover:text-stone-900 transition-colors block">
-                        第 {String(lesson.number).padStart(2, '0')} 篇
+                    <div className="min-w-0">
+                      <span className="font-medium text-stone-700 text-sm group-hover:text-stone-900 transition-colors block truncate">
+                        {lesson.title || `第 ${String(lesson.number).padStart(2, '0')} 篇`}
                       </span>
-                      <span className="text-xs text-stone-400 font-mono tabular-nums">
-                        {new Date(lesson.created_at).toLocaleDateString('zh-CN')}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-stone-400 font-mono tabular-nums">
+                          {new Date(lesson.created_at).toLocaleDateString('zh-CN')}
+                        </span>
+                        {lesson.has_feedback && (
+                          <span className="text-[10px] text-emerald-500">已反馈</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">

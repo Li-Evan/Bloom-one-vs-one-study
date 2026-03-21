@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean, CheckConstraint
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean, CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -22,6 +22,7 @@ class Course(Base):
 
     syllabus = relationship("Syllabus", back_populates="course", uselist=False, cascade="all, delete-orphan")
     lessons = relationship("Lesson", back_populates="course", order_by="Lesson.number", cascade="all, delete-orphan")
+    learning_events = relationship("LearningEvent", back_populates="course", cascade="all, delete-orphan")
 
 
 class Syllabus(Base):
@@ -37,6 +38,9 @@ class Syllabus(Base):
 
 class Lesson(Base):
     __tablename__ = "lessons"
+    __table_args__ = (
+        UniqueConstraint("course_id", "number", name="uq_lesson_course_number"),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     course_id = Column(Integer, ForeignKey("courses.id", ondelete="CASCADE"), nullable=False)
@@ -77,3 +81,16 @@ class Feedback(Base):
     created_at = Column(DateTime, default=_utcnow)
 
     lesson = relationship("Lesson", back_populates="feedback")
+
+
+class LearningEvent(Base):
+    """Track learning activities for analytics."""
+    __tablename__ = "learning_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    course_id = Column(Integer, ForeignKey("courses.id", ondelete="CASCADE"), nullable=False)
+    lesson_number = Column(Integer, nullable=True)
+    event_type = Column(String, nullable=False)  # lesson_opened, lesson_completed, annotation_added, feedback_submitted
+    created_at = Column(DateTime, default=_utcnow)
+
+    course = relationship("Course", back_populates="learning_events")

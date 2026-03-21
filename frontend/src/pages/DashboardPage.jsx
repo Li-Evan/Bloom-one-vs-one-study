@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCourses, createCourse } from '../lib/api';
+import { getCourses, createCourse, deleteCourse, getGlobalStats } from '../lib/api';
 
 export default function DashboardPage() {
   const [courses, setCourses] = useState([]);
+  const [stats, setStats] = useState(null);
   const [newCourseName, setNewCourseName] = useState('');
   const [newCourseRef, setNewCourseRef] = useState('');
   const [showCreate, setShowCreate] = useState(false);
@@ -13,8 +14,8 @@ export default function DashboardPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getCourses()
-      .then(setCourses)
+    Promise.all([getCourses(), getGlobalStats()])
+      .then(([c, s]) => { setCourses(c); setStats(s); })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
@@ -35,6 +36,17 @@ export default function DashboardPage() {
       setError(err.message);
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleDelete = async (e, courseId) => {
+    e.stopPropagation();
+    if (!confirm('确定删除这个课程吗？所有课文和批注都将丢失。')) return;
+    try {
+      await deleteCourse(courseId);
+      setCourses((prev) => prev.filter((c) => c.id !== courseId));
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -64,6 +76,28 @@ export default function DashboardPage() {
             新建课程
           </button>
         </div>
+
+        {/* Learning Stats */}
+        {stats && (stats.total_courses > 0) && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+            <div className="bg-white rounded-xl border border-stone-200/60 p-4">
+              <p className="text-2xl font-semibold text-stone-900 tabular-nums">{stats.total_lessons_read}</p>
+              <p className="text-xs text-stone-400 mt-1">已学课文</p>
+            </div>
+            <div className="bg-white rounded-xl border border-stone-200/60 p-4">
+              <p className="text-2xl font-semibold text-stone-900 tabular-nums">{stats.total_annotations}</p>
+              <p className="text-xs text-stone-400 mt-1">批注数</p>
+            </div>
+            <div className="bg-white rounded-xl border border-stone-200/60 p-4">
+              <p className="text-2xl font-semibold text-stone-900 tabular-nums">{stats.current_streak}</p>
+              <p className="text-xs text-stone-400 mt-1">连续学习天数</p>
+            </div>
+            <div className="bg-white rounded-xl border border-stone-200/60 p-4">
+              <p className="text-2xl font-semibold text-emerald-600 tabular-nums">{stats.completed_courses}</p>
+              <p className="text-xs text-stone-400 mt-1">已完成课程</p>
+            </div>
+          </div>
+        )}
 
         {/* Error */}
         {error && (
@@ -142,11 +176,11 @@ export default function DashboardPage() {
         ) : (
           <div className="space-y-2">
             {courses.map((course, i) => (
-              <button
+              <div
                 key={course.id}
-                onClick={() => navigate(`/course/${course.id}`)}
                 style={{ '--i': i }}
                 className="stagger-in w-full bg-white rounded-xl p-5 text-left border border-stone-200/60 hover:border-stone-300 hover:shadow-[0_2px_12px_-4px_rgba(0,0,0,0.06)] transition-all duration-200 group cursor-pointer"
+                onClick={() => navigate(`/course/${course.id}`)}
               >
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium text-stone-800 group-hover:text-stone-900 transition-colors">
@@ -159,21 +193,40 @@ export default function DashboardPage() {
                       </span>
                     ) : (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-stone-50 text-stone-500 border border-stone-100">
-                        学习中
+                        {Math.round(course.mastery_progress * 100)}%
                       </span>
                     )}
                     <span className="text-xs text-stone-400 font-mono tabular-nums">
                       {course.lesson_count} 篇
                     </span>
+                    <button
+                      onClick={(e) => handleDelete(e, course.id)}
+                      className="opacity-0 group-hover:opacity-100 text-stone-300 hover:text-rose-500 transition-all p-1"
+                      title="删除课程"
+                    >
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                      </svg>
+                    </button>
                     <svg className="w-4 h-4 text-stone-300 group-hover:text-stone-500 group-hover:translate-x-0.5 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                     </svg>
                   </div>
                 </div>
-                <p className="text-xs text-stone-400 mt-1.5 font-mono tabular-nums">
-                  {new Date(course.created_at).toLocaleDateString('zh-CN')}
-                </p>
-              </button>
+                <div className="flex items-center gap-3 mt-1.5">
+                  <p className="text-xs text-stone-400 font-mono tabular-nums">
+                    {new Date(course.created_at).toLocaleDateString('zh-CN')}
+                  </p>
+                  {course.status !== 'completed' && course.mastery_progress > 0 && (
+                    <div className="flex-1 h-1 bg-stone-100 rounded-full overflow-hidden max-w-[120px]">
+                      <div
+                        className="h-full bg-emerald-500 rounded-full"
+                        style={{ width: `${Math.round(course.mastery_progress * 100)}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         )}

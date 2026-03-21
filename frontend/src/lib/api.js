@@ -34,6 +34,10 @@ export async function createCourse(name, reference = '') {
   });
 }
 
+export async function deleteCourse(courseId) {
+  return apiRequest(`/courses/${courseId}`, { method: 'DELETE' });
+}
+
 // --- Syllabus ---
 
 export async function getSyllabus(courseId) {
@@ -70,6 +74,12 @@ export async function createAnnotation(courseId, lessonNum, data) {
   });
 }
 
+export async function deleteAnnotation(courseId, lessonNum, annotationId) {
+  return apiRequest(`/courses/${courseId}/lessons/${lessonNum}/annotations/${annotationId}`, {
+    method: 'DELETE',
+  });
+}
+
 // --- Feedback ---
 
 export async function submitFeedback(courseId, lessonNum, content, thoughtAnswers) {
@@ -82,41 +92,73 @@ export async function submitFeedback(courseId, lessonNum, content, thoughtAnswer
 // --- Generate Next Lesson (SSE streaming) ---
 
 export async function generateNextLesson(courseId, onChunk, onDone) {
-  const res = await fetch(`${API_BASE}/courses/${courseId}/next`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 120000); // 2 min timeout
 
-  if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error(data.detail || `请求失败 (${res.status})`);
-  }
+  try {
+    const res = await fetch(`${API_BASE}/courses/${courseId}/next`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+    });
 
-  const reader = res.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.detail || `请求失败 (${res.status})`);
+    }
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
 
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() || '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
 
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        try {
-          const data = JSON.parse(line.slice(6));
-          if (data.content) onChunk(data.content);
-          if (data.done && onDone) onDone(data);
-          if (data.error) throw new Error(data.error);
-        } catch (e) {
-          if (!(e instanceof SyntaxError)) throw e;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.content) onChunk(data.content);
+            if (data.done && onDone) onDone(data);
+            if (data.error) throw new Error(data.error);
+          } catch (e) {
+            if (!(e instanceof SyntaxError)) throw e;
+          }
         }
       }
     }
+  } finally {
+    clearTimeout(timeout);
   }
+}
+
+// --- Feedback GET ---
+
+export async function getFeedback(courseId, lessonNum) {
+  return apiRequest(`/courses/${courseId}/lessons/${lessonNum}/feedback`);
+}
+
+// --- Lesson Events ---
+
+export async function recordLessonOpened(courseId, lessonNum) {
+  return apiRequest(`/courses/${courseId}/lessons/${lessonNum}/opened`, {
+    method: 'POST',
+  });
+}
+
+// --- Stats ---
+
+export async function getGlobalStats() {
+  return apiRequest('/stats');
+}
+
+export async function getCourseStats(courseId) {
+  return apiRequest(`/courses/${courseId}/stats`);
 }
 
 // --- Summary ---

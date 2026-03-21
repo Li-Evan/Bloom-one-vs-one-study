@@ -14,6 +14,7 @@ class CourseResponse(BaseModel):
     status: str
     created_at: datetime
     lesson_count: int = 0
+    mastery_progress: float = 0.0
 
     model_config = {"from_attributes": True}
 
@@ -25,6 +26,7 @@ class CourseDetailResponse(BaseModel):
     created_at: datetime
     lesson_count: int = 0
     syllabus_content: str | None = None
+    mastery_progress: float = 0.0  # 0.0 to 1.0
 
     model_config = {"from_attributes": True}
 
@@ -48,6 +50,8 @@ class LessonListItem(BaseModel):
     id: int
     number: int
     is_evaluation: bool
+    title: str = ""
+    has_feedback: bool = False
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -102,6 +106,39 @@ class FeedbackResponse(BaseModel):
     lesson_id: int
     content: str
     thought_answers: str
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+# Learning Stats
+class CourseStatsResponse(BaseModel):
+    total_lessons: int
+    total_annotations: int
+    total_feedback: int
+    mastery_checked: int
+    mastery_total: int
+    mastery_progress: float  # 0.0 to 1.0
+    first_activity: datetime | None = None
+    last_activity: datetime | None = None
+
+
+class GlobalStatsResponse(BaseModel):
+    total_courses: int
+    active_courses: int
+    completed_courses: int
+    total_lessons_read: int
+    total_annotations: int
+    total_feedback: int
+    current_streak: int  # consecutive days with activity
+    longest_streak: int
+
+
+class LearningEventResponse(BaseModel):
+    id: int
+    course_id: int
+    lesson_number: int | None
+    event_type: str
     created_at: datetime
 
     model_config = {"from_attributes": True}

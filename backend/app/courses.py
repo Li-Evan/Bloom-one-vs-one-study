@@ -8,13 +8,14 @@ from openai import OpenAI
 
 from app.config import settings
 from app.database import get_db
-from app.models import Course, Syllabus, Lesson, Annotation, Feedback
+from app.models import Course, Syllabus, Lesson, Annotation, Feedback, LearningEvent
 from app.schemas import (
     CreateCourseRequest, CourseResponse, CourseDetailResponse,
     SyllabusResponse, SyllabusUpdateRequest,
     LessonListItem, LessonResponse,
     CreateAnnotationRequest, AnnotationResponse,
     CreateFeedbackRequest, FeedbackResponse,
+    CourseStatsResponse, GlobalStatsResponse,
 )
 
 logger = logging.getLogger(__name__)
@@ -101,6 +102,9 @@ FIRST_LESSON_PROMPT = """你是一个基于 Bloom 2-Sigma 理论的一对一苏�
 2. 关键概念加粗，重要定义用引用块
 3. 思考题要有深度，引导用户思考而不是简单记忆
 4. 只输出 markdown 内容
+5. **类比优先**：每个抽象概念至少配一个生活化类比
+6. **先why后what**：先讲为什么需要学这个，再讲内容
+7. **认知负荷控制**：第一课只引入2-3个核心概念，不要铺开太多
 """
 
 NEXT_LESSON_PROMPT = """你是一个基于 Bloom 2-Sigma 理论的一对一苏格拉底式导师。
@@ -177,6 +181,15 @@ NEXT_LESSON_PROMPT = """你是一个基于 Bloom 2-Sigma 理论的一对一苏�
 2. 基于学生反馈和批注调整内容深度和方向
 3. 每篇文档应覆盖大纲中至少一条掌握项
 4. 只输出 markdown 内容
+
+## 教学质量要求
+5. **类比优先**：每个抽象概念至少配一个生活化类比或具体场景，帮助学生建立直觉
+6. **难度自适应**：如果学生反馈中表现出理解困难（多处批注、反馈提问多），降低本篇难度并增加基础铺垫；如果学生表现出游刃有余，适当提升挑战性
+7. **认知负荷控制**：正文部分每次只引入1-2个新概念，不要信息过载
+8. **先why后what**：先讲为什么需要这个概念（动机/问题），再讲概念本身
+9. **思考题层次**：至少一题是应用级（把概念用到新场景），至少一题是分析级（比较、判断、推理）
+10. **掌握项标记**：在文档最末尾（反馈区之后）追加一个隐藏注释块，列出本篇覆盖了哪些大纲掌握项的原文（必须与大纲中的文字完全一致），格式如下：
+    <!-- mastery: 能够解释核心概念A; 能够应用概念A解决简单问题 -->
 """
 
 EVAL_LESSON_PROMPT = """你是一个基于 Bloom 2-Sigma 理论的一对一苏格拉底式导师。
@@ -327,19 +340,60 @@ def _call_llm(system_prompt: str, user_message: str) -> str:
     return response.choices[0].message.content
 
 
-def _check_all_mastery_items_done(syllabus_content: str) -> bool:
-    """Check if all checkbox items in syllabus are checked."""
-    lines = syllabus_content.split("\n")
-    has_unchecked = False
-    has_any_checkbox = False
-    for line in lines:
+def _count_mastery_items(syllabus_content: str) -> tuple[int, int]:
+    """Count (checked, total) mastery checkbox items in syllabus."""
+    checked = 0
+    total = 0
+    for line in syllabus_content.split("\n"):
         stripped = line.strip()
         if stripped.startswith("- [ ]"):
-            has_unchecked = True
-            has_any_checkbox = True
+            total += 1
         elif stripped.startswith("- [x]") or stripped.startswith("- [X]"):
-            has_any_checkbox = True
-    return has_any_checkbox and not has_unchecked
+            checked += 1
+            total += 1
+    return checked, total
+
+
+def _check_all_mastery_items_done(syllabus_content: str) -> bool:
+    """Check if all checkbox items in syllabus are checked."""
+    checked, total = _count_mastery_items(syllabus_content)
+    return total > 0 and checked == total
+
+
+def _mastery_progress(syllabus_content: str) -> float:
+    """Return mastery progress as 0.0 to 1.0."""
+    checked, total = _count_mastery_items(syllabus_content)
+    return checked / total if total > 0 else 0.0
+
+
+def _record_event(db: Session, course_id: int, event_type: str, lesson_number: int | None = None):
+    """Record a learning event."""
+    db.add(LearningEvent(course_id=course_id, lesson_number=lesson_number, event_type=event_type))
+    db.flush()
+
+
+_MASTERY_COMMENT_RE = re.compile(r'<!--\s*mastery:\s*(.+?)\s*-->', re.IGNORECASE)
+
+
+def _auto_check_mastery(syllabus_content: str, lesson_content: str) -> str:
+    """Parse mastery items from lesson content and check them in syllabus."""
+    match = _MASTERY_COMMENT_RE.search(lesson_content)
+    if not match:
+        return syllabus_content
+
+    items = [item.strip() for item in match.group(1).split(";") if item.strip()]
+    if not items:
+        return syllabus_content
+
+    updated = syllabus_content
+    for item in items:
+        # Replace "- [ ] ...item..." with "- [x] ...item..."
+        unchecked = f"- [ ] {item}"
+        checked = f"- [x] {item}"
+        if unchecked in updated:
+            updated = updated.replace(unchecked, checked, 1)
+
+    return updated
 
 
 # ---------------------------------------------------------------------------
@@ -370,6 +424,9 @@ def create_course(req: CreateCourseRequest, db: Session = Depends(get_db)):
         lesson = Lesson(course_id=course.id, number=1, content=lesson_content)
         db.add(lesson)
 
+        _record_event(db, course.id, "course_created")
+        _record_event(db, course.id, "lesson_generated", lesson_number=1)
+
         db.commit()
         db.refresh(course)
 
@@ -377,6 +434,7 @@ def create_course(req: CreateCourseRequest, db: Session = Depends(get_db)):
             id=course.id, name=course.name, status=course.status,
             created_at=course.created_at, lesson_count=1,
             syllabus_content=syllabus_content,
+            mastery_progress=0.0,
         )
     except Exception as e:
         logger.exception("Course creation error")
@@ -391,9 +449,20 @@ def list_courses(db: Session = Depends(get_db)):
         CourseResponse(
             id=c.id, name=c.name, status=c.status,
             created_at=c.created_at, lesson_count=len(c.lessons),
+            mastery_progress=_mastery_progress(c.syllabus.content) if c.syllabus else 0.0,
         )
         for c in courses
     ]
+
+
+@router.delete("/courses/{course_id}")
+def delete_course(course_id: int, db: Session = Depends(get_db)):
+    course = db.query(Course).filter(Course.id == course_id).first()
+    if not course:
+        raise HTTPException(status_code=404, detail="课程不存在")
+    db.delete(course)
+    db.commit()
+    return {"ok": True}
 
 
 @router.get("/courses/{course_id}", response_model=CourseDetailResponse)
@@ -401,10 +470,12 @@ def get_course(course_id: int, db: Session = Depends(get_db)):
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
+    progress = _mastery_progress(course.syllabus.content) if course.syllabus else 0.0
     return CourseDetailResponse(
         id=course.id, name=course.name, status=course.status,
         created_at=course.created_at, lesson_count=len(course.lessons),
         syllabus_content=course.syllabus.content if course.syllabus else None,
+        mastery_progress=progress,
     )
 
 
@@ -435,13 +506,27 @@ def update_syllabus(
     return course.syllabus
 
 
+def _extract_title(content: str) -> str:
+    """Extract first H1 title from markdown content."""
+    for line in content.split("\n"):
+        stripped = line.strip()
+        if stripped.startswith("# ") and not stripped.startswith("## "):
+            return stripped[2:].strip()
+    return ""
+
+
 @router.get("/courses/{course_id}/lessons", response_model=list[LessonListItem])
 def list_lessons(course_id: int, db: Session = Depends(get_db)):
     course = db.query(Course).filter(Course.id == course_id).first()
     if not course:
         raise HTTPException(status_code=404, detail="课程不存在")
     return [
-        LessonListItem(id=l.id, number=l.number, is_evaluation=l.is_evaluation, created_at=l.created_at)
+        LessonListItem(
+            id=l.id, number=l.number, is_evaluation=l.is_evaluation,
+            title=_extract_title(l.content),
+            has_feedback=l.feedback is not None,
+            created_at=l.created_at,
+        )
         for l in course.lessons
     ]
 
@@ -479,6 +564,7 @@ def create_annotation(
         comment=req.comment,
     )
     db.add(annotation)
+    _record_event(db, course_id, "annotation_added", lesson_number=lesson_num)
     db.commit()
     db.refresh(annotation)
     return annotation
@@ -497,6 +583,29 @@ def get_annotations(
     if not lesson:
         raise HTTPException(status_code=404, detail="课文不存在")
     return db.query(Annotation).filter(Annotation.lesson_id == lesson.id).order_by(Annotation.created_at).all()
+
+
+@router.delete("/courses/{course_id}/lessons/{lesson_num}/annotations/{annotation_id}")
+def delete_annotation(
+    course_id: int,
+    lesson_num: int,
+    annotation_id: int,
+    db: Session = Depends(get_db),
+):
+    course = db.query(Course).filter(Course.id == course_id).first()
+    if not course:
+        raise HTTPException(status_code=404, detail="课程不存在")
+    lesson = db.query(Lesson).filter(Lesson.course_id == course_id, Lesson.number == lesson_num).first()
+    if not lesson:
+        raise HTTPException(status_code=404, detail="课文不存在")
+    annotation = db.query(Annotation).filter(
+        Annotation.id == annotation_id, Annotation.lesson_id == lesson.id
+    ).first()
+    if not annotation:
+        raise HTTPException(status_code=404, detail="批注不存在")
+    db.delete(annotation)
+    db.commit()
+    return {"ok": True}
 
 
 @router.post("/courses/{course_id}/lessons/{lesson_num}/feedback", response_model=FeedbackResponse)
@@ -518,6 +627,7 @@ def create_feedback(
     if existing:
         existing.content = req.content
         existing.thought_answers = req.thought_answers
+        _record_event(db, course_id, "feedback_updated", lesson_number=lesson_num)
         db.commit()
         db.refresh(existing)
         return existing
@@ -528,6 +638,7 @@ def create_feedback(
         thought_answers=req.thought_answers,
     )
     db.add(feedback)
+    _record_event(db, course_id, "feedback_submitted", lesson_number=lesson_num)
     db.commit()
     db.refresh(feedback)
     return feedback
@@ -626,6 +737,16 @@ def generate_next_lesson(
                 content=lesson_content, is_evaluation=is_eval,
             )
             db.add(new_lesson)
+            _record_event(db, cid, "lesson_generated", lesson_number=next_number)
+
+            # Auto-update syllabus mastery items based on lesson content
+            if not is_eval:
+                course_obj = db.query(Course).filter(Course.id == cid).first()
+                if course_obj and course_obj.syllabus:
+                    updated = _auto_check_mastery(course_obj.syllabus.content, lesson_content)
+                    if updated != course_obj.syllabus.content:
+                        course_obj.syllabus.content = updated
+
             db.commit()
 
             yield f"data: {json.dumps({'done': True, 'lesson_number': next_number, 'is_evaluation': is_eval}, ensure_ascii=False)}\n\n"
@@ -690,3 +811,146 @@ def get_summary(course_id: int, db: Session = Depends(get_db)):
     if not summary:
         raise HTTPException(status_code=404, detail="总结尚未生成")
     return {"content": summary.content}
+
+
+# ---------------------------------------------------------------------------
+# Feedback GET — restore saved feedback on page load
+# ---------------------------------------------------------------------------
+
+@router.get("/courses/{course_id}/lessons/{lesson_num}/feedback")
+def get_feedback(course_id: int, lesson_num: int, db: Session = Depends(get_db)):
+    course = db.query(Course).filter(Course.id == course_id).first()
+    if not course:
+        raise HTTPException(status_code=404, detail="课程不存在")
+    lesson = db.query(Lesson).filter(Lesson.course_id == course_id, Lesson.number == lesson_num).first()
+    if not lesson:
+        raise HTTPException(status_code=404, detail="课文不存在")
+    feedback = db.query(Feedback).filter(Feedback.lesson_id == lesson.id).first()
+    if not feedback:
+        return {"exists": False, "content": "", "thought_answers": ""}
+    return {
+        "exists": True,
+        "id": feedback.id,
+        "content": feedback.content,
+        "thought_answers": feedback.thought_answers or "",
+        "created_at": feedback.created_at.isoformat() if feedback.created_at else None,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Lesson opened event — frontend calls this when user opens a lesson
+# ---------------------------------------------------------------------------
+
+@router.post("/courses/{course_id}/lessons/{lesson_num}/opened")
+def record_lesson_opened(course_id: int, lesson_num: int, db: Session = Depends(get_db)):
+    course = db.query(Course).filter(Course.id == course_id).first()
+    if not course:
+        raise HTTPException(status_code=404, detail="课程不存在")
+    _record_event(db, course_id, "lesson_opened", lesson_number=lesson_num)
+    db.commit()
+    return {"ok": True}
+
+
+# ---------------------------------------------------------------------------
+# Learning Stats
+# ---------------------------------------------------------------------------
+
+@router.get("/courses/{course_id}/stats", response_model=CourseStatsResponse)
+def get_course_stats(course_id: int, db: Session = Depends(get_db)):
+    course = db.query(Course).filter(Course.id == course_id).first()
+    if not course:
+        raise HTTPException(status_code=404, detail="课程不存在")
+
+    normal_lessons = [l for l in course.lessons if l.number > 0]
+    total_annotations = sum(len(l.annotations) for l in normal_lessons)
+    total_feedback = sum(1 for l in normal_lessons if l.feedback)
+
+    checked, total = (0, 0)
+    if course.syllabus:
+        checked, total = _count_mastery_items(course.syllabus.content)
+
+    events = db.query(LearningEvent).filter(
+        LearningEvent.course_id == course_id
+    ).order_by(LearningEvent.created_at).all()
+
+    first_activity = events[0].created_at if events else None
+    last_activity = events[-1].created_at if events else None
+
+    return CourseStatsResponse(
+        total_lessons=len(normal_lessons),
+        total_annotations=total_annotations,
+        total_feedback=total_feedback,
+        mastery_checked=checked,
+        mastery_total=total,
+        mastery_progress=checked / total if total > 0 else 0.0,
+        first_activity=first_activity,
+        last_activity=last_activity,
+    )
+
+
+from datetime import date, timedelta
+from sqlalchemy import func
+
+
+@router.get("/stats", response_model=GlobalStatsResponse)
+def get_global_stats(db: Session = Depends(get_db)):
+    courses = db.query(Course).all()
+    total_courses = len(courses)
+    active_courses = sum(1 for c in courses if c.status == "learning")
+    completed_courses = sum(1 for c in courses if c.status == "completed")
+
+    total_lessons = db.query(Lesson).filter(Lesson.number > 0).count()
+    total_annotations = db.query(Annotation).count()
+    total_feedback = db.query(Feedback).count()
+
+    # Calculate streaks from learning events
+    event_dates = db.query(
+        func.date(LearningEvent.created_at)
+    ).distinct().order_by(func.date(LearningEvent.created_at).desc()).all()
+
+    event_dates = [row[0] for row in event_dates]
+
+    current_streak = 0
+    longest_streak = 0
+
+    if event_dates:
+        # Current streak: count consecutive days ending today or yesterday
+        today = date.today()
+        streak = 0
+        for i, d in enumerate(event_dates):
+            if isinstance(d, str):
+                d = date.fromisoformat(d)
+            expected = today - timedelta(days=i)
+            if d == expected:
+                streak += 1
+            elif i == 0 and d == today - timedelta(days=1):
+                # Allow streak to start from yesterday
+                streak += 1
+                today = today - timedelta(days=1)
+            else:
+                break
+        current_streak = streak
+
+        # Longest streak
+        if event_dates:
+            sorted_dates = sorted(set(date.fromisoformat(str(d)) if isinstance(d, str) else d for d in event_dates))
+            best = 1
+            run = 1
+            for i in range(1, len(sorted_dates)):
+                if sorted_dates[i] - sorted_dates[i - 1] == timedelta(days=1):
+                    run += 1
+                    best = max(best, run)
+                else:
+                    run = 1
+            longest_streak = best
+
+    return GlobalStatsResponse(
+        total_courses=total_courses,
+        active_courses=active_courses,
+        completed_courses=completed_courses,
+        total_lessons_read=total_lessons,
+        total_annotations=total_annotations,
+        total_feedback=total_feedback,
+        current_streak=current_streak,
+        longest_streak=longest_streak,
+    )

@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import {
-  getLesson, getLessons, getAnnotations, createAnnotation,
-  submitFeedback, generateNextLesson,
+  getLesson, getLessons, getAnnotations, createAnnotation, deleteAnnotation,
+  submitFeedback, generateNextLesson, getFeedback, recordLessonOpened,
 } from '../lib/api';
 
 const stripFences = (text) => {
@@ -38,6 +38,7 @@ export default function LessonPage() {
 
   const [generating, setGenerating] = useState(false);
   const [streamContent, setStreamContent] = useState('');
+  const [showMobileNav, setShowMobileNav] = useState(false);
 
   const contentRef = useRef(null);
 
@@ -54,15 +55,34 @@ export default function LessonPage() {
       getLesson(courseId, lessonNum),
       getAnnotations(courseId, lessonNum),
       getLessons(courseId),
+      getFeedback(courseId, lessonNum),
     ])
-      .then(([l, a, all]) => {
+      .then(([l, a, all, fb]) => {
         setLesson(l);
         setAnnotations(a);
         setAllLessons(all.filter((x) => x.number > 0));
+        if (fb.exists) {
+          setFeedbackContent(fb.content || '');
+          setThoughtAnswers(fb.thought_answers || '');
+          setFeedbackSaved(true);
+        }
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
+
+    // Record lesson opened event + scroll to top
+    recordLessonOpened(courseId, lessonNum).catch(() => {});
+    window.scrollTo(0, 0);
   }, [courseId, lessonNum]);
+
+  const handleDeleteAnnotation = async (annId) => {
+    try {
+      await deleteAnnotation(courseId, lessonNum, annId);
+      setAnnotations((prev) => prev.filter((a) => a.id !== annId));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   const handleTextSelect = () => {
     const selection = window.getSelection();
@@ -199,9 +219,19 @@ export default function LessonPage() {
             </svg>
             返回课程
           </button>
-          <span className="text-xs text-stone-500 font-mono tabular-nums">
-            {String(lessonNum).padStart(2, '0')}{lesson?.is_evaluation ? ' / EVAL' : ''}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-stone-500 font-mono tabular-nums">
+              {String(lessonNum).padStart(2, '0')}{lesson?.is_evaluation ? ' / EVAL' : ''}
+            </span>
+            <button
+              onClick={() => setShowMobileNav(!showMobileNav)}
+              className="lg:hidden text-stone-400 hover:text-white transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -225,11 +255,24 @@ export default function LessonPage() {
               <h3 className="text-xs font-medium text-amber-700 uppercase tracking-wide mb-3">我的批注</h3>
               <div className="space-y-2">
                 {annotations.map((ann) => (
-                  <div key={ann.id} className="bg-white rounded-lg p-3 border border-amber-100/60">
-                    <p className="text-xs text-stone-400 mb-1 leading-relaxed">
-                      原文：{ann.original_text.length > 80 ? ann.original_text.slice(0, 80) + '...' : ann.original_text}
-                    </p>
-                    <p className="text-sm text-stone-700">{ann.comment}</p>
+                  <div key={ann.id} className="bg-white rounded-lg p-3 border border-amber-100/60 group/ann">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-stone-400 mb-1 leading-relaxed">
+                          原文：{ann.original_text.length > 80 ? ann.original_text.slice(0, 80) + '...' : ann.original_text}
+                        </p>
+                        <p className="text-sm text-stone-700">{ann.comment}</p>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteAnnotation(ann.id)}
+                        className="opacity-0 group-hover/ann:opacity-100 text-stone-300 hover:text-rose-500 transition-all shrink-0 p-1"
+                        title="删除批注"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -273,10 +316,16 @@ export default function LessonPage() {
             </div>
           </div>
 
-          {/* Error */}
+          {/* Error with retry */}
           {error && (
-            <div className="mb-6 bg-rose-50 text-rose-600 text-sm px-4 py-2.5 rounded-lg border border-rose-100">
-              {error}
+            <div className="mb-6 bg-rose-50 text-rose-600 text-sm px-4 py-2.5 rounded-lg border border-rose-100 flex items-center justify-between">
+              <span>{error}</span>
+              <button
+                onClick={() => { setError(''); handleReadDone(); }}
+                className="text-xs text-rose-700 underline hover:text-rose-900 ml-3 shrink-0"
+              >
+                重试
+              </button>
             </div>
           )}
 
@@ -309,63 +358,83 @@ export default function LessonPage() {
           </p>
         </main>
 
-        {/* Right sidebar — chapter nav */}
-        <aside className="hidden lg:block w-48 shrink-0">
-          <div className="sticky top-20">
-            <h3 className="text-xs font-medium text-stone-400 uppercase tracking-wide mb-3">章节</h3>
-            <nav className="space-y-0.5">
-              {/* Syllabus link */}
+        {/* Right sidebar — chapter nav (desktop: always visible, mobile: toggle) */}
+        <aside className={`${showMobileNav ? 'fixed inset-0 z-40 bg-stone-950/30' : 'hidden'} lg:relative lg:block lg:bg-transparent`}>
+          <div
+            className={`${showMobileNav ? 'fixed right-0 top-0 h-full w-64 bg-white shadow-xl p-6 pt-16 overflow-y-auto z-50' : ''} lg:static lg:w-48 lg:shrink-0 lg:shadow-none lg:p-0`}
+          >
+            {showMobileNav && (
               <button
-                onClick={() => navigate(`/course/${courseId}/syllabus`)}
-                className="w-full text-left px-3 py-2 rounded-lg text-sm text-stone-500 hover:bg-stone-100 hover:text-stone-700 transition-all duration-150 flex items-center gap-2.5 cursor-pointer"
+                onClick={() => setShowMobileNav(false)}
+                className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 lg:hidden"
               >
-                <span className="text-stone-300">
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                  </svg>
-                </span>
-                <span>大纲</span>
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
-
-              {allLessons.map((l) => {
-                const isActive = l.number === currentNum;
-                return (
-                  <button
-                    key={l.id}
-                    onClick={() => navigate(`/course/${courseId}/lesson/${l.number}`)}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-150 flex items-center gap-2.5 cursor-pointer ${
-                      isActive
-                        ? 'bg-stone-900 text-white'
-                        : 'text-stone-500 hover:bg-stone-100 hover:text-stone-700'
-                    }`}
-                  >
-                    <span className={`font-mono tabular-nums text-xs ${isActive ? 'text-stone-400' : 'text-stone-300'}`}>
-                      {String(l.number).padStart(2, '0')}
-                    </span>
-                    <span>
-                      第 {String(l.number).padStart(2, '0')} 篇
-                    </span>
-                    {l.is_evaluation && (
-                      <span className={`text-[10px] ml-auto ${isActive ? 'text-amber-300' : 'text-amber-500'}`}>
-                        评估
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
-
-            {/* Quick info */}
-            <div className="mt-6 pt-6 border-t border-stone-100 space-y-2">
-              {annotations.length > 0 && (
-                <div className="px-3 py-1">
-                  <span className="text-[10px] text-stone-300">
-                    {annotations.length} 条批注
+            )}
+            <div className="lg:sticky lg:top-20">
+              <h3 className="text-xs font-medium text-stone-400 uppercase tracking-wide mb-3">章节</h3>
+              <nav className="space-y-0.5">
+                <button
+                  onClick={() => { navigate(`/course/${courseId}/syllabus`); setShowMobileNav(false); }}
+                  className="w-full text-left px-3 py-2 rounded-lg text-sm text-stone-500 hover:bg-stone-100 hover:text-stone-700 transition-all duration-150 flex items-center gap-2.5 cursor-pointer"
+                >
+                  <span className="text-stone-300">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    </svg>
                   </span>
-                </div>
-              )}
+                  <span>大纲</span>
+                </button>
+
+                {allLessons.map((l) => {
+                  const isActive = l.number === currentNum;
+                  return (
+                    <button
+                      key={l.id}
+                      onClick={() => { navigate(`/course/${courseId}/lesson/${l.number}`); setShowMobileNav(false); }}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-150 cursor-pointer ${
+                        isActive
+                          ? 'bg-stone-900 text-white'
+                          : 'text-stone-500 hover:bg-stone-100 hover:text-stone-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span className={`font-mono tabular-nums text-xs shrink-0 ${isActive ? 'text-stone-400' : 'text-stone-300'}`}>
+                          {String(l.number).padStart(2, '0')}
+                        </span>
+                        <span className="truncate">
+                          {l.title || `第 ${String(l.number).padStart(2, '0')} 篇`}
+                        </span>
+                        {l.is_evaluation && (
+                          <span className={`text-[10px] ml-auto shrink-0 ${isActive ? 'text-amber-300' : 'text-amber-500'}`}>
+                            评估
+                          </span>
+                        )}
+                      </div>
+                      {l.has_feedback && !isActive && (
+                        <span className="ml-7 text-[10px] text-emerald-500">已反馈</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+
+              <div className="mt-6 pt-6 border-t border-stone-100 space-y-2">
+                {annotations.length > 0 && (
+                  <div className="px-3 py-1">
+                    <span className="text-[10px] text-stone-300">
+                      {annotations.length} 条批注
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
+          {showMobileNav && (
+            <div className="fixed inset-0 z-40 lg:hidden" onClick={() => setShowMobileNav(false)} />
+          )}
         </aside>
       </div>
 
