@@ -17,6 +17,7 @@
 - **Confidence calibration** — the thinking-questions section always asks the user to append a confidence rating (1-5) to each answer. In the next article's review, mark answers that were **confident (4-5) but wrong** with 🚩: these are miscalibrations, the highest-priority re-teach targets — address them in the new body content before anything else.
 - **Misconception box ⚠️** — where the topic has a well-known misconception relevant to the article, include a `> ⚠️ **Common misconception:** …` block that names it and shows why it fails. Evaluation questions should deliberately target previously shown misconceptions.
 - **Faded scaffolding** — across a course (or within a Part, for extended courses), examples should progress: fully **worked examples** early → **completion problems** (partial solution the user finishes) in the middle → **independent application** late. Do not stay at worked-example level throughout.
+- **Real-world anchor 🌍** — every Part (or every standard course) must include at least one article grounded in an **authentic artifact from the wild** — a real open-source config or code excerpt, a real dataset row, a real paper passage, a real historical case — cited by origin, not a synthetic example. Wild artifacts are messier than textbook ones; that mess is the point (transfer). For skill-based topics the anchor can double as a practice-arena source.
 - **Micro-quest 🎯 (optional)** — where the material allows, add one small, hands-on "try this" task after the thinking questions (a calculation to attempt, a snippet to run, an observation to make, a prediction to test). Strictly optional for the user; if they report the outcome in feedback, weave the result into the next article.
 - **Practice arena (skill-based topics)** — when the topic is a *performable skill* (an editor, a CLI, a language's syntax, an instrument of any kind), upgrade the 🎯 micro-quest to a **practice arena**: generate a companion file under `practice/` in the topic folder (`practice/03-macros.txt`, extension fitting the material) containing realistic messy/broken content, and list 2-4 concrete tasks in the article's 🎯 section ("normalize every date in this file with one macro"). The user performs the tasks *in the real tool* and reports how it went (approach, keystrokes, where it fought back) in feedback; the next article's review discusses their approach vs. an idiomatic one. At most one arena file per article; tasks use only techniques taught so far.
 
@@ -136,6 +137,7 @@ The beginning must contain two fixed modules, in an order that cannot be reverse
 
 [same requirements as the first article's body]
 [if this is the first article after a part evaluation: open with a graded assessment of the user's Feynman explanation (✅/⚠️/❌ per key idea) and the Part rank (S/A/B/C, rubric below), then proceed to new content]
+[when opening a new Part, bridge into it with the crossover method (`skills/learn-crossover/SKILL.md`): connect the Part's core ideas to the user's confirmed background from Learner Notes and to earlier Parts — "you already know half of this" beats a cold start]
 
 ## Thinking Questions
 

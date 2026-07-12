@@ -76,6 +76,10 @@ root directory/learning-log.jsonl   # Global learning log, append-only, do not e
 - Every article must carry a substantial increment of knowledge; do not generate "too watered-down" content; encourage the user to form their own mental models rather than rote memorization.
 - `???`/`？？？` are the user's most immediate thought snapshots, with higher priority than the end-of-article feedback.
 
+## Sibling Methods (learn-*)
+
+The standalone `skills/learn-*` methods are wired into defined moments: **learn-occam** when scoping the syllabus (cut modules that don't earn their items), **learn-crossover** when opening a new Part (bridge from Learner Notes background), **learn-feynman** at part-eval Feynman gates. Read the sibling SKILL.md only at those moments.
+
 ## references Index (read only when needed)
 
 - **`references/syllabus.md`** — the core philosophy of the syllabus, format template, depth and length axes, Parts (extended courses), progress bar, generation requirements, checkbox-and-progress linkage

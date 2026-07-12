@@ -44,6 +44,16 @@ After completing this topic, you will be able to:
 
 (**Extended courses only**: group the modules under `## Part N · [Part name]` headings, 3-5 modules per Part, ordered so each Part builds on the previous ones; standard courses omit Part headings entirely)
 
+## Module Map
+
+```mermaid
+graph LR
+  M1[Module one] --> M2[Module two]
+  M1 --> M3[Module three]
+```
+
+(A small dependency graph of the modules — which builds on which. Required for extended courses, optional for standard. Lets the user see why the order is what it is, and ask for an informed reorder.)
+
 ## Out of Scope for This Topic
 
 - [Explicitly list which related topics this course does not cover, to avoid mismatched expectations]
@@ -58,6 +68,7 @@ After completing this topic, you will be able to:
 ## Requirements for Generating the Syllabus
 
 1. All mastery items must be **verifiable behaviors** (able to explain, able to derive, able to apply, able to judge); writing unverifiable statements like "be aware of X" or "be familiar with Y" is prohibited
+   - Scope every module with the Occam lens (`skills/learn-occam/SKILL.md`): does it earn its mastery items for **this user's** goal in Learner Notes? Cut nice-to-know material into "Out of Scope" rather than diluting the syllabus
 2. Learning depth determines the scope of each module's expansion (counts below are for **standard length**):
    - **Simple**: 2-3 modules, 8-10 mastery items; focus on the main thread, the minimum necessary concepts, and high-frequency applications
    - **Standard**: 3-4 modules, 10-12 mastery items; cover core concepts, key reasoning, typical applications, and common misconceptions
