@@ -18,6 +18,7 @@
 - **Misconception box ⚠️** — where the topic has a well-known misconception relevant to the article, include a `> ⚠️ **Common misconception:** …` block that names it and shows why it fails. Evaluation questions should deliberately target previously shown misconceptions.
 - **Faded scaffolding** — across a course (or within a Part, for extended courses), examples should progress: fully **worked examples** early → **completion problems** (partial solution the user finishes) in the middle → **independent application** late. Do not stay at worked-example level throughout.
 - **Micro-quest 🎯 (optional)** — where the material allows, add one small, hands-on "try this" task after the thinking questions (a calculation to attempt, a snippet to run, an observation to make, a prediction to test). Strictly optional for the user; if they report the outcome in feedback, weave the result into the next article.
+- **Practice arena (skill-based topics)** — when the topic is a *performable skill* (an editor, a CLI, a language's syntax, an instrument of any kind), upgrade the 🎯 micro-quest to a **practice arena**: generate a companion file under `practice/` in the topic folder (`practice/03-macros.txt`, extension fitting the material) containing realistic messy/broken content, and list 2-4 concrete tasks in the article's 🎯 section ("normalize every date in this file with one macro"). The user performs the tasks *in the real tool* and reports how it went (approach, keystrokes, where it fought back) in feedback; the next article's review discusses their approach vs. an idiomatic one. At most one arena file per article; tasks use only techniques taught so far.
 
 ## Side Quests (`sq-XX.md`)
 
@@ -255,6 +256,14 @@ The evaluation article is the course's "final boss": it answers the last body ar
 [questions, without answers]
 
 > After each answer, add your confidence: (1 = guessing … 5 = certain)
+
+---
+
+## Capstone (extended courses only)
+
+> 🛠️ One constructive mini-project that exercises techniques from **every Part** — build/transform something real, not answer questions. For skill-based topics, ship it as a `practice/capstone.*` arena file. Ask the user to annotate *which technique they used where*; the annotations are graded with the Final Challenge and feed the course rank.
+
+[project brief: the goal, the constraints (e.g. "course techniques only"), and what to report back; omit this section entirely in standard-length courses]
 
 ---
 

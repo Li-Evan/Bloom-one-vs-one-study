@@ -48,7 +48,7 @@ While reading, if the user considers that a certain knowledge point, insight, or
 1. Read all `XX.md` documents inside the topic folder (full content)
 2. Read `syllabus.md` and confirm all mastery items are checked
 3. If `pre-summary.md` exists, read all user-annotated material within it
-4. **Grade the Final Challenge**: evaluate the user's challenge answers from the evaluation article's feedback (✅/⚠️/❌ + 🚩 calibration flags), then determine the **course rank** (S/A/B/C, rubric in `articles.md`; for extended courses, weigh the Part ranks in as well)
+4. **Grade the Final Challenge** (and the Capstone, in extended courses): evaluate the user's challenge answers and capstone annotations from the evaluation article's feedback (✅/⚠️/❌ + 🚩 calibration flags), then determine the **course rank** (S/A/B/C, rubric in `articles.md`; for extended courses, weigh the Part ranks in as well)
 5. Generate `summary.md`, with content including:
    - **Course certificate** (header): topic, depth and length, dates (start → completion), articles read, side quests taken, `???` resolved, Part ranks (extended courses), and the **course rank** with one sentence of reasoning
    - **Final Challenge results**: the graded answers from step 4
@@ -56,6 +56,7 @@ While reading, if the user considers that a certain knowledge point, insight, or
    - **Syllabus review**: review the achievement status of each mastery item one by one, briefly describing what was actually mastered
    - **Insights accumulated by the user**: **naturally integrate** the `pre-summary.md` material into the corresponding sections, rather than listing it separately
    - **Remaining questions / directions for extension**: unresolved confusions or directions worth continuing to explore
-6. **Immediately delete `pre-summary.md` after generation is complete** (if it exists)
-7. **Append a course-completion entry to `learning-log.jsonl`** with the rank and the weakest items, which schedules spaced review (see `references/logging.md`)
-8. Inform the user: "🎉 Course complete with rank [X]! `summary.md` has been auto-generated; you can review it. I'll offer a quick flash review of this topic in about a week to lock it in."
+6. **Generate `cheatsheet.md`** in the topic folder: a dense, scannable quick reference distilled from the mastery items, the course's key commands/formulas/rules, and the user's `#summary` marks — organized for *lookup while doing*, not re-learning (tables and terse lines, no prose paragraphs, one page if possible)
+7. **Immediately delete `pre-summary.md` after generation is complete** (if it exists)
+8. **Append a course-completion entry to `learning-log.jsonl`** with the rank and the weakest items, which schedules spaced review (see `references/logging.md`)
+9. Inform the user: "🎉 Course complete with rank [X]! `summary.md` and `cheatsheet.md` have been auto-generated. I'll offer a quick flash review of this topic in about a week to lock it in."

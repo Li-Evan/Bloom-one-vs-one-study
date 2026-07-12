@@ -61,10 +61,12 @@ This is a **coherent judgment**, do not split it into separate steps:
 ├── sources.md         # Source-grounded courses only: corpus manifest, chapter → module mapping
 ├── 01.md, 02.md ...   # Article-by-article explanations, adaptively advanced
 ├── sq-01.md ...       # Optional side quests (off-syllabus curiosity), never block progress
+├── practice/          # Skill-based topics: arena files for hands-on tasks (incl. capstone.*)
 ├── <part evaluation>.md      # Extended courses only; begins with <!-- part-eval -->, mid-course boss
 ├── <evaluation article>.md   # Begins with <!-- eval-article -->, reviews + Final Challenge, adds no new content
 ├── pre-summary.md     # Intermediate product, auto-deleted when learning is complete, never displayed and never mentioned
-└── summary.md         # Auto-generated after the evaluation article is read; includes certificate + rank
+├── summary.md         # Auto-generated after the evaluation article is read; includes certificate + rank
+└── cheatsheet.md      # Auto-generated with summary.md: dense quick reference for lookup while doing
 root directory/learning-log.jsonl   # Global learning log, append-only, do not edit by hand
 ```
 

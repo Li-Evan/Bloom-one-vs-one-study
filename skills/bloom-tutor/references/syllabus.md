@@ -7,7 +7,7 @@
 - Every learning outcome in the syllabus is a specific, verifiable ability, not a vague "be aware of / understand"
 - The syllabus has **two independent, user-pickable axes**:
   - **Depth** — **simple**, **standard**, **deep** (how deep each module goes). Default: **standard**.
-  - **Length** — **standard** (3-5 modules, one final evaluation) or **extended** (~12-20 modules grouped into **Parts**, a part-evaluation "mid-boss" after each Part, then the final evaluation). Default: **standard**. Pick extended when the user says "marathon course", "extended course", or asks for a long/comprehensive course.
+  - **Length** — **standard** (3-5 modules, one final evaluation) or **extended** (~12-20 modules grouped into **Parts**, a part-evaluation "mid-boss" after each Part, then the final evaluation with a constructive **Capstone**). Default: **standard**. Pick extended when the user says "marathon course", "extended course", or asks for a long/comprehensive course.
 - **Source-grounded courses**: derive modules from what the corpus in `sources.md` covers; "Out of Scope" must name relevant areas the corpus lacks (see `references/sources.md`)
 
 ## Format
