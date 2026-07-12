@@ -1,60 +1,82 @@
-# 学习日志 与 渐进式加载
+# Learning Log and Progressive Loading
 
-`learning-log.jsonl` 位于工作根目录，仅追加、绝不覆盖或修改已有条目。
+`learning-log.jsonl` lives in the working root directory; append-only, never overwrite or modify existing entries.
 
-## `/整理学习` — 记录增量学习到日志
+## `/organize learning` — Record incremental learning to the log
 
-**触发词：** `/整理学习`、「整理最近学到的东西」、「记录一下学习日志」
+**Triggers:** `/organize learning`, "organize what I've recently learned", "record this in the learning log"
 
-**步骤：**
+**Steps:**
 
-1. **读取日志基线**：读根目录 `learning-log.jsonl`，取最后一条记录的 `date` 和 `courses`（各课题最后读到哪篇）
-2. **扫描所有课题文件夹**：列出根目录下所有子文件夹（排除隐藏目录和 `.templates`），对每个课题：
-   - 列出所有 `XX.md`（排除 `syllabus.md`、`summary.md`）
-   - 与基线对比，找出**新增的文档**（上次记录之后完成的）
-   - 读取这些新文档，提炼 3-5 个核心概念/知识点
-3. **生成日志条目**：构造以下单行 JSON，**追加**到 `learning-log.jsonl`：
+1. **Read the log baseline**: read the root-directory `learning-log.jsonl`, take the `date` and `courses` from the last record (the last document read in each topic)
+2. **Scan all topic folders**: list every subfolder under the root directory (excluding hidden directories and `.templates`), and for each topic:
+   - List every `XX.md` (excluding `syllabus.md` and `summary.md`)
+   - Compare against the baseline to find the **newly added documents** (those completed after the last record)
+   - Read these new documents and distill 3-5 core concepts / key points
+3. **Generate the log entry**: construct the following single-line JSON and **append** it to `learning-log.jsonl`:
 
 ```json
 {
   "date": "YYYY-MM-DD",
   "courses": [
     {
-      "name": "课题名称（文件夹名）",
+      "name": "topic name (folder name)",
       "new_docs": ["02.md", "03.md"],
-      "key_concepts": ["概念1", "概念2", "概念3"],
-      "progress": "已完成 X 篇，共 Y 篇"
+      "key_concepts": ["concept 1", "concept 2", "concept 3"],
+      "progress": "X of Y documents completed"
     }
   ],
-  "summary": "一句话总结本次学习增量",
+  "summary": "one-sentence summary of this learning increment",
   "total_new_docs": 0
 }
 ```
 
-4. **向用户展示摘要**：用中文简洁展示本次新增了哪些课题的哪些内容，不重复 JSON 原文
+4. **Show the user a summary**: concisely present (in the session language, English by default) which content was newly added to which topics, without repeating the raw JSON
 
-**规则：**
-- 只追加，绝不覆盖或修改已有条目
-- 无任何新增文档时也追加一条，`total_new_docs` 为 0，`summary` 写「本期无新增学习内容」
-- 第一次运行（日志为空）时，扫描所有现有文档作为初始基线，`summary` 写「初始化学习日志」
+**Rules:**
+- Append only; never overwrite or modify existing entries
+- When there are no newly added documents at all, still append one entry with `total_new_docs` set to 0 and `summary` set to "no new learning content this period"
+- On the first run (when the log is empty), scan all existing documents as the initial baseline and set `summary` to "initialize learning log"
 
-## `/查看学习日志` — 回顾历史
+## `/view learning log` — Review history
 
-**触发词：** `/查看学习日志`、「我最近学了什么」、「回顾一下学习记录」
+**Triggers:** `/view learning log`, "what have I learned recently", "review my learning records"
 
-**步骤：**
-1. 读取根目录 `learning-log.jsonl` 全部条目
-2. 以时间倒序（最新在前），用中文格式化展示：日期、课题、新增文档数、核心概念
+**Steps:**
+1. Read all entries in the root-directory `learning-log.jsonl`
+2. In reverse chronological order (newest first), format and present (in the session language, English by default): date, topic, number of new documents, core concepts
 
-## 渐进式加载原则
+## Spaced Review (retention after course completion)
 
-`learning-log.jsonl` 是了解学习状态的**第一入口**。当用户问「我最近学了什么」「进度怎样」或任何需要了解学习状态的场景：
+Entries without a `type` field are the `/organize learning` increments above. Two additional typed entries drive spaced review:
 
-1. **先读 `learning-log.jsonl`** —— 它记录了所有课题的最新进度、已完成文档、核心概念摘要
-2. **日志足够时不主动展开具体文档**，直接基于日志回答
-3. **只在以下情况才下钻具体文档**：
-   - 用户对某概念有疑问，需查看原文细节
-   - 用户明确要求「帮我看看 XX 课题的第 N 篇」
-   - 日志信息不足以回答，且已向用户说明需要深入查看
+**On course completion** (step 7 of `references/summary.md`), append:
 
-> 先从最轻量的摘要层（日志）开始，有需要再向下钻取具体文档，而不是一次性加载所有课题内容。
+```json
+{"type": "course_complete", "date": "YYYY-MM-DD", "topic": "topic name", "rank": "A", "weakest_items": ["item …", "item …"], "next_review_days": 7}
+```
+
+**Offering a flash review** — at the start of any bloom-tutor conversation (after reading the log), check every `course_complete` topic: if `next_review_days` have passed since its latest `course_complete` or `flash_review` entry, **offer** a flash review ("It's been a while since [topic] — up for a 3-question flash review?"). Never force it; if declined, simply don't ask again until the next due window.
+
+**Running a flash review** — conversational, no new files:
+
+1. Pick 3 questions from the topic's mastery items, prioritizing `weakest_items` and past 🚩 miscalibrations (read `syllabus.md`/`summary.md` of that topic only if the log lacks detail)
+2. Evaluate the answers ✅/⚠️/❌ conversationally, with brief corrections
+3. Append the result, expanding the interval (7 → 30 → 90 days; on a poor result, keep the current interval instead of expanding):
+
+```json
+{"type": "flash_review", "date": "YYYY-MM-DD", "topic": "topic name", "score": "2/3", "next_review_days": 30}
+```
+
+## Progressive Loading Principle
+
+`learning-log.jsonl` is the **first entry point** for understanding learning state. When the user asks "what have I learned recently", "how is my progress", or in any scenario that requires understanding learning state:
+
+1. **Read `learning-log.jsonl` first** — it records the latest progress of every topic, the completed documents, and a summary of core concepts
+2. **When the log is sufficient, do not proactively expand into specific documents**; answer directly based on the log
+3. **Only drill down into specific documents in the following cases**:
+   - The user has a question about some concept and needs to see the original details
+   - The user explicitly requests "show me document N of topic XX"
+   - The log information is insufficient to answer, and you have already told the user that a deeper look is needed
+
+> Start from the lightest summary layer (the log), and drill down into specific documents only when needed, rather than loading all topic content at once.

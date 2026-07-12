@@ -1,57 +1,61 @@
-# 总结素材收集 与 课程完结
+# Summary Material Collection and Course Completion
 
-## 用户在学习途中记录总结素材
+## The user records summary material while learning
 
-用户阅读时若认为某个知识点、洞察或类比应进入最终总结，可用以下任意方式标注，**全部都应识别并收录**：
+While reading, if the user considers that a certain knowledge point, insight, or analogy should go into the final summary, they may mark it using any of the following methods, **all of which must be recognized and collected**:
 
-- `#summary:[内容]` 或 `＃summary:[内容]`（带 # 的规范格式）
-- `summary:[内容]` 或 `summary [内容]`（不带 #）
-- `???[...这个要总结...]` / `？？？[...]`（在问号注释中提到「总结」「加到总结」「记进总结」等意图）
-- 以上变体的大小写混用（`Summary:`、`SUMMARY:`）
+- `#summary:[content]` or `＃summary:[content]` (the canonical format with #)
+- `summary:[content]` or `summary [content]` (without #)
+- `???[...this should be summarized...]` / `？？？[...]` (expressing intent such as "summarize", "add to summary", "record in summary" within a question-mark comment)
+- Mixed casing of the above variants (`Summary:`, `SUMMARY:`)
 
-**识别原则：宽松匹配** —— 只要用户表达了「这个内容应该进最终总结」的意图，无论形式如何都收录。
+**Recognition principle: lenient matching** — as long as the user expresses the intent that "this content should go into the final summary", collect it regardless of its form.
 
-**处理规则：**
+**Processing rules:**
 
-1. 生成下一篇前扫描全文，识别上述所有标注，将每条追加到课题文件夹内的 `pre-summary.md`（不存在则创建）
-2. `pre-summary.md` 格式为按来源文档分组的简单无序列表：
+1. Before generating the next article, scan the full text, recognize all of the above annotations, and append each one to `pre-summary.md` inside the topic folder (create it if it does not exist)
+2. `pre-summary.md` uses a simple unordered list grouped by source document:
 
 ```markdown
 # Pre-Summary Notes
 
-## 来自 01.md
-- [用户标注的内容1]
-- [用户标注的内容2]
+## From 01.md
+- [content annotated by the user 1]
+- [content annotated by the user 2]
 
-## 来自 02.md
-- [用户标注的内容]
+## From 02.md
+- [content annotated by the user]
 ```
 
-3. `pre-summary.md` 是中间产物，**绝对不是最终总结**：不对用户展示其内容，也不在对话中提及它的存在
+3. `pre-summary.md` is an intermediate product, **absolutely not the final summary**: do not show its content to the user, and do not mention its existence in conversation
 
-## 与用户交互模式
+## Interaction mode with the user
 
-**用户说「我读完了」或提交反馈时** —— 走 `SKILL.md` 的「我读完了 / 提交反馈」决策树。要点重申：收集 `???` 与 `#summary` 标注 → 判断理解 →（必要时苏格拉底 ≤2 轮）→ **更新 `syllabus.md`** → 判断是否评估篇 → 决定生成评估篇 / 下一篇 / 触发 summary。
+**When the user says "I've finished reading" or submits feedback** — follow the "I've finished reading / submit feedback" decision tree in `SKILL.md`. Key points restated: collect `???` and `#summary` annotations → assess understanding → (if necessary, Socratic ≤2 rounds) → **update `syllabus.md` + progress bar** → check the just-read document's first-line marker → generate the next article / a part evaluation / the final evaluation / trigger summary.
 
-**用户直接提问时** —— 不直接答，先反问其理解，引导自己推导，只在确实卡住时给最小提示。
+**When the user asks a question directly** — do not answer directly; first ask them about their understanding, guide them to derive it themselves, and only give a minimal hint when they are truly stuck.
 
-> ⚠️ 铁律重申：用户**不能主动触发** `summary.md`。任何「总结一下」请求，统一回应：「总结会在你学完所有掌握项后自动生成，现在还没到时候。」
+> ⚠️ Iron rule restated: the user **cannot proactively trigger** `summary.md`. Respond to any "summarize this" request uniformly with: "The summary will be auto-generated after you have mastered all mastery items; it's not time yet."
 
-## 课程完结：自动生成 `summary.md`
+## Course completion: auto-generate `summary.md`
 
-**触发条件（缺一不可）：**
-- `syllabus.md` 中所有掌握项均已变为 `[x]`
-- 用户刚说「我读完了」，且当前读完的文档是**评估篇**（开头含 `<!-- eval-article -->`）
+**Trigger conditions (all required):**
+- All mastery items in `syllabus.md` have become `[x]`
+- The user just said "I've finished reading", and the document just finished is an **evaluation article** (begins with `<!-- eval-article -->`)
 
-**生成步骤：**
+**Generation steps:**
 
-1. 读取课题文件夹内所有 `XX.md` 文档（完整内容）
-2. 读取 `syllabus.md`，确认所有掌握项已勾选
-3. 若存在 `pre-summary.md`，读取其中所有用户标注素材
-4. 生成 `summary.md`，内容包括：
-   - **知识图谱**：核心概念及其关系（列表或层级结构）
-   - **大纲复盘**：逐条回顾每条掌握项的达成情况，简述实际掌握内容
-   - **用户积累的洞察**：将 `pre-summary.md` 素材**自然整合**进对应章节，而非单独列出
-   - **遗留问题 / 延伸方向**：未解决的困惑或值得继续探索的方向
-5. **生成完毕后立即删除 `pre-summary.md`**（若存在）
-6. 告知用户：「🎉 课程完成！已自动生成 `summary.md`，你可以查看。」
+1. Read all `XX.md` documents inside the topic folder (full content)
+2. Read `syllabus.md` and confirm all mastery items are checked
+3. If `pre-summary.md` exists, read all user-annotated material within it
+4. **Grade the Final Challenge**: evaluate the user's challenge answers from the evaluation article's feedback (✅/⚠️/❌ + 🚩 calibration flags), then determine the **course rank** (S/A/B/C, rubric in `articles.md`; for extended courses, weigh the Part ranks in as well)
+5. Generate `summary.md`, with content including:
+   - **Course certificate** (header): topic, depth and length, dates (start → completion), articles read, side quests taken, `???` resolved, Part ranks (extended courses), and the **course rank** with one sentence of reasoning
+   - **Final Challenge results**: the graded answers from step 4
+   - **Knowledge graph**: core concepts and their relationships (list or hierarchical structure)
+   - **Syllabus review**: review the achievement status of each mastery item one by one, briefly describing what was actually mastered
+   - **Insights accumulated by the user**: **naturally integrate** the `pre-summary.md` material into the corresponding sections, rather than listing it separately
+   - **Remaining questions / directions for extension**: unresolved confusions or directions worth continuing to explore
+6. **Immediately delete `pre-summary.md` after generation is complete** (if it exists)
+7. **Append a course-completion entry to `learning-log.jsonl`** with the rank and the weakest items, which schedules spaced review (see `references/logging.md`)
+8. Inform the user: "🎉 Course complete with rank [X]! `summary.md` has been auto-generated; you can review it. I'll offer a quick flash review of this topic in about a week to lock it in."

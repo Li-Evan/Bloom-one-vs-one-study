@@ -1,60 +1,78 @@
-# 课程大纲 `syllabus.md` 规则
+# Course Syllabus `syllabus.md` Rules
 
-**核心哲学：学习目标固定，学习路径弹性。**
+**Core philosophy: learning objectives are fixed, the learning path is flexible.**
 
-- 大纲规定的是**学完这门课你能做什么**，而不是「第 01 篇讲什么、第 02 篇讲什么」
-- 文档数量不做任何限制 —— 有的人 4 篇学完，有的人需要 10 篇，完全取决于起点和节奏
-- 大纲中的每一条学习成果，都是可被验证的具体能力，而不是模糊的「了解/理解」
-- 大纲支持三种学习深度：**简单**、**标准**、**深入**。用户未指定时，默认使用**标准**。
+- The syllabus specifies **what you will be able to do after completing this course**, not "what article 01 covers, what article 02 covers"
+- There is no limit on the number of documents — some people finish in 4 articles, others need 10; it depends entirely on the starting point and pace
+- Every learning outcome in the syllabus is a specific, verifiable ability, not a vague "be aware of / understand"
+- The syllabus has **two independent, user-pickable axes**:
+  - **Depth** — **simple**, **standard**, **deep** (how deep each module goes). Default: **standard**.
+  - **Length** — **standard** (3-5 modules, one final evaluation) or **extended** (~12-20 modules grouped into **Parts**, a part-evaluation "mid-boss" after each Part, then the final evaluation). Default: **standard**. Pick extended when the user says "marathon course", "extended course", or asks for a long/comprehensive course.
+- **Source-grounded courses**: derive modules from what the corpus in `sources.md` covers; "Out of Scope" must name relevant areas the corpus lacks (see `references/sources.md`)
 
-## 格式
+## Format
 
 ```markdown
-# [课题名] · 课程大纲
+# [Topic name] · Course Syllabus
 
-> 这份大纲定义了完成本课题后你将掌握的所有能力。
-> 学习深度：[简单 / 标准 / 深入]
-> 文档数量因人而异，但掌握内容不打折扣。
+> This syllabus defines all the abilities you will master after completing this topic.
+> Learning depth: [simple / standard / deep] · Course length: [standard / extended]
+> The number of documents varies from person to person, but the mastered content is not compromised.
 
-## 核心掌握项
+**Progress:** `░░░░░░░░░░` 0/[total] mastery items
 
-完成本课题后，你将能够：
+## Learner Notes
 
-### [模块一名称]
-- [ ] [具体能力描述，用「能够……」句式，可验证]
-- [ ] [具体能力描述]
+- Goal: [what the user wants from this course, in their words]
+- Background: [relevant prior knowledge/tools, for crossover bridging]
+- Style: [analogies-first / formal-first / mixed] · hands-on [high / medium / low] · side quests [freely / sparingly / never]
+- Observed: [dated one-liners appended during learning]
 
-### [模块二名称]
-- [ ] [具体能力描述]
-- [ ] [具体能力描述]
+## Core Mastery Items
 
-（按知识模块分组，每条用 checkbox 表示，学完后可勾选）
+After completing this topic, you will be able to:
 
-## 不在本课题范围内
+### [Module one name]
+- [ ] [Specific ability description, using the "be able to……" sentence form, verifiable]
+- [ ] [Specific ability description]
 
-- [明确列出哪些相关主题本课不涵盖，避免预期错位]
+### [Module two name]
+- [ ] [Specific ability description]
+- [ ] [Specific ability description]
 
-## 学习进度
+(Grouped by knowledge module, each item represented with a checkbox, to be checked off after learning)
 
-| 文档 | 覆盖掌握项 | 生成日期 |
+(**Extended courses only**: group the modules under `## Part N · [Part name]` headings, 3-5 modules per Part, ordered so each Part builds on the previous ones; standard courses omit Part headings entirely)
+
+## Out of Scope for This Topic
+
+- [Explicitly list which related topics this course does not cover, to avoid mismatched expectations]
+
+## Learning Progress
+
+| Document | Mastery items covered | Generation date |
 |------|-----------|---------|
-| （每次生成新文档后自动追加一行） |
+| (Automatically append a row after each new document is generated) |
 ```
 
-## 生成大纲的要求
+## Requirements for Generating the Syllabus
 
-1. 所有掌握项必须是**可验证的行为**（能解释、能推导、能应用、能判断），禁止写「了解 X」「熟悉 Y」这类无法验证的表述
-2. 学习深度决定大纲展开范围：
-   - **简单**：2-3 个模块，8-10 条掌握项；聚焦主干、最低必要概念和高频应用
-   - **标准**：3-4 个模块，10-12 条掌握项；覆盖核心概念、关键推理、典型应用和常见误区
-   - **深入**：4-5 个模块，12-15 条掌握项；加入第一性原理、底层机制、边界条件、反例和迁移判断
-3. 模块必须按知识的内在逻辑组织，不超过 5 个
-4. **「不在本课题范围内」必须填写**，帮用户建立清晰的边界预期
+1. All mastery items must be **verifiable behaviors** (able to explain, able to derive, able to apply, able to judge); writing unverifiable statements like "be aware of X" or "be familiar with Y" is prohibited
+2. Learning depth determines the scope of each module's expansion (counts below are for **standard length**):
+   - **Simple**: 2-3 modules, 8-10 mastery items; focus on the main thread, the minimum necessary concepts, and high-frequency applications
+   - **Standard**: 3-4 modules, 10-12 mastery items; cover core concepts, key reasoning, typical applications, and common misconceptions
+   - **Deep**: 4-5 modules, 12-15 mastery items; add first principles, underlying mechanisms, boundary conditions, counterexamples, and transfer judgment
+   - **Extended length**: 12-20 modules total, grouped into 4-6 Parts of 3-5 modules each; per-module item density follows the chosen depth (roughly 35-60 mastery items total). Each Part must be a coherent sub-arc with its own narrative (foundations → mechanisms → applications → frontiers is a typical shape).
+3. Modules must be organized according to the intrinsic logic of the knowledge; standard courses must not exceed 5 modules, extended courses must not exceed 5 modules per Part
+4. **"Out of Scope for This Topic" must be filled in**, to help the user establish clear boundary expectations
 
-## 大纲与文档的联动
+## Linkage Between the Syllabus and Documents
 
-- 每篇新文档生成**前**，检查大纲中哪些掌握项尚未被覆盖，确保整体进度不偏航；每篇内容应能对应大纲中至少一条掌握项，不生成与大纲无关的内容
-- 每篇新文档生成**后**，必须立即更新本文件：
-  1. 将本篇覆盖的掌握项对应的 `[ ]` 改为 `[x]`
-  2. 在「## 学习进度」表格追加一行：文档编号、覆盖的掌握项（简短列举）、生成日期
-- 当所有掌握项全部变为 `[x]` 时，**不直接生成 `summary.md`**，而是先生成「评估篇」（见 `articles.md`）
+- **Before** each new document is generated, check which mastery items in the syllabus have not yet been covered, to ensure the overall progress does not veer off course; each article's content should map to at least one mastery item in the syllabus, and no content unrelated to the syllabus should be generated
+- **After** each new document is generated, this file must be updated immediately:
+  1. Change the `[ ]` corresponding to the mastery items covered by this article to `[x]`
+  2. **Update the progress bar**: `▓` for each mastered item's share, `░` for the rest, over 10 characters, plus the `N/total` count (e.g. `▓▓▓░░░░░░░ 7/24`)
+  3. Append a row to the "## Learning Progress" table: document number, mastery items covered (briefly listed), generation date
+- Side quests (`sq-XX.md`) do **not** check items, do **not** move the progress bar, and are **not** added to the progress table
+- **Extended courses**: when all of the current Part's items have become `[x]`, generate a **part evaluation article** (`<!-- part-eval -->`, see `articles.md`) before starting the next Part
+- When all mastery items have become `[x]`, **do not directly generate `summary.md`**; instead, first generate the "evaluation article" (see `articles.md`)

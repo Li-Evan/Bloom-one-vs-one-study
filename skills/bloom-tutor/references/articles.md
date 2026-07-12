@@ -1,169 +1,265 @@
-# 文章格式与导师原则
+# Article Format and Tutor Principles
 
-## 文档迭代规则
+## Document Iteration Rules
 
-1. 每个课题文件夹内，文章按序号命名：`01.md`、`02.md`、`03.md`……
-2. 用户读后会在文末（或文件夹内）写下问题、感悟、反馈；也可在文中任意位置用 `???` 或 `？？？` 标注困惑
-3. 生成下一篇前，**必须先读完用户在前一篇的所有反馈和行内注释**，基于其理解程度和兴趣方向调整内容深度与方向
-4. 这样形成自适应的学习阶梯，内容既不过于简单也不过于跳跃
-5. **从 `02.md` 起，每篇开头必须依次包含**：① 上一篇思考题复盘 → ② `???` 解答 → ③ 正文新内容（顺序不可颠倒，不得省略前两个模块）
+1. Within each topic folder, articles are named by sequence number: `01.md`, `02.md`, `03.md`……
+2. After reading, the user writes questions, reflections, and feedback at the end of the article (or within the folder); they may also mark confusion at any position in the text with `???` or `？？？`
+3. Before generating the next article, **you must first read all of the user's feedback and inline annotations on the previous article**, and adjust the depth and direction of the content based on their level of understanding and their interests
+4. This forms an adaptive learning staircase, where the content is neither too simple nor too big a leap
+5. **Starting from `02.md`, the beginning of every article must contain, in order**: ① review of the previous article's thinking questions → ② `???` answers → ③ new body content (the order cannot be reversed, and the first two modules cannot be omitted)
+6. Side quests are named `sq-01.md`, `sq-02.md`… and sit outside this sequence (see "Side Quests" below)
 
-## 行内注释规则（`???`）
+## Pedagogical Devices (apply in every body article)
 
-用户可在文档任意位置写 `???[具体困惑或想法]` 或 `？？？[...]`（半角/全角均可），标在产生疑问或兴趣的段落旁。
+- **Learner fit** — design each article against the syllabus's "Learner Notes" (framing style, example choice, 🎯 micro-quest density, side-quest offers) without announcing it; see `references/profile.md`
+- **Source grounding** — in source-grounded courses, follow the citation and further-reading rules of `references/sources.md`
+- **Spiral retrieval 🔄** — from `03.md` onward, one of the thinking questions must be a recall/application question drawn from material **at least 2 articles back**, preferentially targeting the user's weakest mastery items so far. Mark it with 🔄. This spaces retrieval practice inside the course instead of only testing the most recent material.
+- **Confidence calibration** — the thinking-questions section always asks the user to append a confidence rating (1-5) to each answer. In the next article's review, mark answers that were **confident (4-5) but wrong** with 🚩: these are miscalibrations, the highest-priority re-teach targets — address them in the new body content before anything else.
+- **Misconception box ⚠️** — where the topic has a well-known misconception relevant to the article, include a `> ⚠️ **Common misconception:** …` block that names it and shows why it fails. Evaluation questions should deliberately target previously shown misconceptions.
+- **Faded scaffolding** — across a course (or within a Part, for extended courses), examples should progress: fully **worked examples** early → **completion problems** (partial solution the user finishes) in the middle → **independent application** late. Do not stay at worked-example level throughout.
+- **Micro-quest 🎯 (optional)** — where the material allows, add one small, hands-on "try this" task after the thinking questions (a calculation to attempt, a snippet to run, an observation to make, a prediction to test). Strictly optional for the user; if they report the outcome in feedback, weave the result into the next article.
 
-1. 生成下一篇前**扫描全文所有 `???`/`？？？`**，逐条理解意图
-2. **不必逐条依序回答** —— 作为整体综合判断用户的理解盲区与兴趣倾向
-3. 从注释提炼三件事：用户的**理解断层**、更强**好奇心**的方向、**思维习惯**（偏直觉/推理/类比）
-4. 把提炼结果直接体现在下一篇的内容设计上，而非单独说「我看到你的注释了」
-5. 若某条注释反映严重概念误解，先用苏格拉底提问澄清再写下一篇
+## Side Quests (`sq-XX.md`)
 
-## 苏格拉底式导师原则
+When `???` annotations show strong curiosity about something **outside the syllabus**, you may offer a side quest during the bridging phase ("Want a short side quest on X? It won't affect your course progress.").
 
-苏格拉底式确认只用于**衔接阶段**（用户提交反馈后、生成下一篇前），且**每次最多 2 轮**，到点必出下一篇。
+- Generated **only if the user accepts**, and it counts as that turn's single document
+- Free-form single article: body + optional thinking questions; **no** review modules, **no** mastery-item check-offs, **no** progress-table row
+- Never generate a side quest instead of a due evaluation article, and never let side quests chain (one at a time; return to the main course next turn)
 
-1. 每轮只问 1-2 个关键问题，不一次灌输太多
-2. 问题指向核心薄弱点 —— 从 `???` 注释和文末反馈中提炼，不泛泛而问
-3. 优先在文档设计上体现对薄弱点的针对，而非靠反复追问
-4. 语气耐心鼓励，但不手软 —— 理解错误时温和纠正，不放过任何盲点
+## Inline Annotation Rules (`???`)
 
-## 导师模式切换
+The user may write `???[specific confusion or thought]` or `？？？[...]` (half-width or full-width both acceptable) at any position in the document, next to the paragraph that raised a question or interest.
 
-- 生成 `.md` 文档时 → **讲解模式**：清晰、有深度、有例子地阐述知识
-- 对话交互时 → **提问模式**：苏格拉底式反问，引导用户思考；用户直接提问时，先反问其理解，引导自己推导，只在确实卡住时给最小提示
+1. Before generating the next article, **scan the entire text for all `???`/`？？？`** and understand the intent of each one
+2. **You need not answer each one individually and in order** —— judge the user's blind spots in understanding and their interests holistically, as a whole
+3. Distill three things from the annotations: the user's **gaps in understanding**, the directions of stronger **curiosity**, and their **thinking habits** (leaning toward intuition/reasoning/analogy)
+4. Reflect the distilled results directly in the content design of the next article, rather than separately saying "I saw your annotations"
+5. If a particular annotation reflects a serious conceptual misunderstanding, first clarify it with Socratic questioning before writing the next article
+
+## Socratic Tutor Principles
+
+Socratic confirmation is used only during the **bridging phase** (after the user submits feedback, before generating the next article), and **at most 2 rounds each time**; once the limit is reached, the next article must be produced.
+
+1. Each round asks only 1-2 key questions, not too much at once
+2. Questions point at core weak spots —— distilled from `???` annotations and end-of-article feedback, not asked in vague generalities
+3. Prioritize addressing the weak spots through the document's design rather than through repeated follow-up questioning
+4. The tone is patient and encouraging, but not soft —— gently correct misunderstandings, and let no blind spot slip by
+
+## Tutor Mode Switch
+
+- When generating a `.md` document → **explanation mode**: expound the knowledge clearly, with depth and examples
+- During conversational interaction → **questioning mode**: Socratic counter-questions that guide the user to think; when the user asks a direct question, first ask back about their understanding to guide them to derive it themselves, giving a minimal hint only when they are truly stuck
 
 ---
 
-## 首篇（`01.md`）格式
+## First Article (`01.md`) Format
 
 ```markdown
-# [章节标题]
+# [Chapter Title]
 
-> 前置知识：[列出阅读本文需要的前置知识]
-> 难度：[入门 / 进阶 / 高级]
-> 预计阅读时间：[X 分钟]
+> Prerequisites: [list the prior knowledge needed to read this article]
+> Difficulty: [Beginner / Intermediate / Advanced]
+> Estimated reading time: [X minutes]
 
-## 正文内容
+## Body Content
 
-[清晰、有深度、有举例的知识阐述]
-[关键概念用 **加粗** 标注]
-[重要定义或公式用引用块]
+[clear, in-depth knowledge exposition with examples]
+[mark key concepts in **bold**]
+[use quote blocks for important definitions or formulas]
 
-## 思考题
+## Thinking Questions
 
-[2-3 个引导深入思考的问题，不给答案]
+[2-3 questions that guide deeper thinking, without giving answers]
 
-## 你的反馈
+> After each answer, add your confidence: (1 = guessing … 5 = certain)
 
-> 在这里写下你的问题、感悟、不理解的地方，或者你希望下一篇深入探讨的方向。
+## 🎯 Micro-quest (optional)
+
+[one small hands-on task; omit the section if the material doesn't lend itself to one]
+
+## Your Feedback
+
+> Write here your questions, reflections, things you don't understand, or the directions you'd like the next article to explore in depth.
 ```
 
-## 续篇（`02.md` 起）格式
+## Follow-up Article (from `02.md`) Format
 
-开头必须包含两个固定模块，顺序不可颠倒，完成后再进入正文新内容。
+The beginning must contain two fixed modules, in an order that cannot be reversed; only after completing them do you move on to the new body content.
 
 ```markdown
-# [章节标题]
+# [Chapter Title]
 
-> 前置知识：[...]
-> 难度：[入门 / 进阶 / 高级]
-> 预计阅读时间：[X 分钟]
-
----
-
-## 上一篇思考题复盘
-
-> 📝 本模块评估你对上一篇思考题的回答，并给出正确答案。
-
-### 你的回答评估
-
-[逐题评估用户的思考题回答：标注 ✅对 / ❌错 / ⚠️部分正确，并简要说明理由]
-[用户未作答则注明「未作答」，直接给出正确答案]
-
-### 正确答案
-
-**第1题：** [题目简述]
-> [完整的正确答案和必要的解析]
-
-**第2题：** [题目简述]
-> [完整的正确答案和必要的解析]
-
-（覆盖上一篇所有思考题）
+> Prerequisites: [...]
+> Difficulty: [Beginner / Intermediate / Advanced]
+> Estimated reading time: [X minutes]
 
 ---
 
-## ??? 解答
+## Review of Previous Article's Thinking Questions
 
-> 💬 本模块解答你在上一篇中用 `???` / `？？？` 标注的所有困惑。
+> 📝 This module evaluates your answers to the previous article's thinking questions and gives the correct answers.
 
-[若无任何 ??? 标注，写「上一篇中没有 ??? 标注，直接进入新内容。」]
+### Evaluation of Your Answers
 
-**??? [引用用户的原始标注内容]**
-[清晰、有深度的解答，必要时配例子或类比]
+[evaluate the user's thinking-question answers one by one: mark ✅ correct / ❌ wrong / ⚠️ partially correct, with a brief explanation of the reasoning]
+[🚩 flag any answer rated confidence 4-5 that was ❌/⚠️ — a miscalibration; re-teach it with top priority in this article's body]
+[if the user did not answer, note "Not answered" and give the correct answer directly]
 
-（逐条解答所有 ??? 标注）
+### Correct Answers
+
+**Question 1:** [brief statement of the question]
+> [complete correct answer and any necessary analysis]
+
+**Question 2:** [brief statement of the question]
+> [complete correct answer and any necessary analysis]
+
+(cover all of the previous article's thinking questions)
 
 ---
 
-## 正文内容
+## ??? Answers
 
-[同首篇正文要求]
+> 💬 This module answers all the confusions you marked with `???` / `？？？` in the previous article.
 
-## 思考题
+[if there are no ??? annotations, write "There were no ??? annotations in the previous article; proceeding directly to the new content."]
 
-[2-3 个问题，不给答案]
+**??? [quote the user's original annotation content]**
+[clear, in-depth answer, with an example or analogy where necessary]
 
-## 你的反馈
+(answer all ??? annotations one by one)
 
-> 在这里写下你的问题、感悟、不理解的地方，或者你希望下一篇深入探讨的方向。
+---
+
+## Body Content
+
+[same requirements as the first article's body]
+[if this is the first article after a part evaluation: open with a graded assessment of the user's Feynman explanation (✅/⚠️/❌ per key idea) and the Part rank (S/A/B/C, rubric below), then proceed to new content]
+
+## Thinking Questions
+
+[2-3 questions, without giving answers; from `03.md` onward one must be a 🔄 spiral-retrieval question from ≥2 articles back]
+
+> After each answer, add your confidence: (1 = guessing … 5 = certain)
+
+## 🎯 Micro-quest (optional)
+
+[one small hands-on task; omit if not applicable]
+
+## Your Feedback
+
+> Write here your questions, reflections, things you don't understand, or the directions you'd like the next article to explore in depth.
 ```
 
-## 评估篇（最后正文篇编号 +1）格式
+## Part Evaluation Article (extended courses; last body article number + 1) Format
 
-评估篇是课程的「收尾确认篇」，专门回答最后一篇正文的思考题和 `???`，**不含任何新内容**。
+Generated when **all of the current Part's mastery items** are checked. A mid-course "boss": it closes the Part with retrieval and self-explanation, and **contains no new content**.
 
-> ⚠️ **必须以 `<!-- eval-article -->` 作为第一行**，这是系统识别「是否为评估篇」的唯一标志，不得省略。
+> ⚠️ **It must have `<!-- part-eval -->` as its first line** — this is the sole marker by which the decision tree recognizes it.
+
+```markdown
+<!-- part-eval -->
+
+# [Topic Name] · Part [N] Evaluation: [Part name]
+
+> This article closes Part [N]. No new content — prove the Part is yours.
+
+---
+
+## Review of Previous Article's Thinking Questions
+
+[same format as a follow-up article: evaluation ✅/❌/⚠️ + 🚩 calibration flags + correct answers]
+
+---
+
+## ??? Answers
+
+[same format as a follow-up article]
+
+---
+
+## Part Challenge
+
+> 🎯 3-5 application questions spanning **this whole Part's** mastery items — scenario-based where possible, deliberately including the Part's ⚠️ misconceptions as traps. Recall and application only; nothing outside what was taught.
+
+[questions, without answers; ask for confidence ratings as usual]
+
+## Feynman Gate
+
+> ✍️ In the feedback below, explain the core of this Part **in plain language, as if to a smart 12-year-old** — 5-8 sentences, no jargon. Your explanation and challenge answers will be graded at the start of the next article, with a Part rank.
+
+## Your Feedback
+
+> Challenge answers + confidence, your Feynman explanation, and anything still unclear.
+```
+
+## Rank Rubric (Part rank and course rank)
+
+Judged from thinking-question/challenge accuracy, calibration, and (for Parts) the Feynman explanation:
+
+- **S** — essentially all ✅, no 🚩, Feynman explanation correct and genuinely plain-language
+- **A** — mostly ✅ with minor ⚠️, at most one 🚩, sound explanation
+- **B** — noticeable ⚠️/❌ or several 🚩; core is there but edges are shaky
+- **C** — significant gaps; recommend a review pass before moving on (but never block the user)
+
+Ranks are a reward and a signal, not a gate — always announce them with the reasoning, and never make the user repeat material to "earn" progression.
+
+## Evaluation Article (last body article number + 1) Format
+
+The evaluation article is the course's "final boss": it answers the last body article's thinking questions and `???`, then poses a **Final Challenge** spanning the whole syllabus. It **contains no new content** (challenge questions test only what was taught).
+
+> ⚠️ **It must have `<!-- eval-article -->` as its first line**; this is the sole marker by which the system identifies "whether this is the evaluation article," and it must not be omitted.
 
 ```markdown
 <!-- eval-article -->
 
-# [课题名] · 最终评估
+# [Topic Name] · Final Evaluation
 
-> 本篇为课程评估篇，不含新内容。
-> 作用：解答最后一篇的思考题与 ??? 困惑，确认你已完全掌握。
-
----
-
-## 上一篇思考题复盘
-
-> 📝 本模块评估你对上一篇思考题的回答，并给出正确答案。
-
-### 你的回答评估
-
-[逐题评估，标注 ✅ / ❌ / ⚠️，并简要说明理由；未作答则直接给出正确答案]
-
-### 正确答案
-
-**第1题：** [题目简述]
-> [完整答案和解析]
-
-（覆盖所有思考题）
+> This article is the course's final boss and contains no new content.
+> Purpose: to answer the last article's thinking questions and ??? confusions, then confirm full mastery through the Final Challenge.
 
 ---
 
-## ??? 解答
+## Review of Previous Article's Thinking Questions
 
-> 💬 本模块解答你在上一篇中用 `???` / `？？？` 标注的所有困惑。
+> 📝 This module evaluates your answers to the previous article's thinking questions and gives the correct answers.
 
-[若无标注，写「上一篇中没有 ??? 标注。」]
+### Evaluation of Your Answers
 
-**??? [引用原始标注内容]**
-[清晰解答，必要时配例子]
+[evaluate one by one, marking ✅ / ❌ / ⚠️, with a brief explanation of the reasoning; if not answered, give the correct answer directly]
+
+### Correct Answers
+
+**Question 1:** [brief statement of the question]
+> [complete answer and analysis]
+
+(cover all thinking questions)
 
 ---
 
-## 你的反馈
+## ??? Answers
 
-> 写下你对这门课的最终感想、仍有疑问的地方，或希望延伸的方向。
-> 当你读完本篇后，告诉我「我读完了」，系统将自动为你生成完整的 `summary.md`。
+> 💬 This module answers all the confusions you marked with `???` / `？？？` in the previous article.
+
+[if there are no annotations, write "There were no ??? annotations in the previous article."]
+
+**??? [quote the original annotation content]**
+[clear answer, with an example where necessary]
+
+---
+
+## Final Challenge
+
+> 🏆 4-6 application questions spanning the **entire syllabus** — scenario-based where possible, weighted toward your weakest mastery items and past 🚩 miscalibrations, with the course's ⚠️ misconceptions as deliberate traps. Nothing outside what was taught.
+
+[questions, without answers]
+
+> After each answer, add your confidence: (1 = guessing … 5 = certain)
+
+---
+
+## Your Feedback
+
+> Your Final Challenge answers + confidence, final thoughts on this course, anything you still have questions about, or directions you'd like to extend into.
+> When you have finished, tell me "I'm done reading" — your challenge answers will be graded, your course rank awarded, and the complete `summary.md` generated automatically.
 ```
