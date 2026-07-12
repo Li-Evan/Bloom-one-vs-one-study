@@ -1,53 +1,53 @@
 ---
 name: learn-crossover
-description: 当用户学习或接触一个新概念/新技术/新算法/新领域时使用（尤其感到陌生或有点难时）。用「跨界原则」拿用户已掌握的知识快速撬动新知识——指出他其实已经学过的同一个东西（换了名字）、结构同构的旧知识、能解释新知识的已有知识，并点出新概念体现的跨领域元知识模式。让「学新东西」变成「发现你已经会了一半」。触发场景：学 X、接触 X、这个好难、X 是什么、帮我理解 X。
+description: Use when the user is learning or encountering a new concept / new technology / new algorithm / new field (especially when it feels unfamiliar or a bit hard). Apply the "crossover principle" to leverage the knowledge the user has already mastered to quickly bootstrap new knowledge — point out the same thing they have in fact already learned (under a different name), old knowledge that is structurally isomorphic, existing knowledge that can explain the new knowledge, and highlight the cross-domain meta-knowledge pattern the new concept embodies. Turn "learning something new" into "discovering you already know half of it." Trigger scenarios: learn X, encountering X, this is so hard, what is X, help me understand X.
 ---
 
-# 跨界原则学习法（learn-crossover）
+# Crossover Principle Learning Method (learn-crossover)
 
-> 核心信条：**真正的快速学会，其实是「你已经学过了」。** 跨界匹配的是**结构**，不是名词。
+> Core creed: **Truly fast learning is really "you have already learned it."** Crossover matches **structure**, not nouns.
 
-## 何时用
+## When to use
 
-用户在学 / 接触一个新概念 X（新技术、新算法、新理论、新领域……），尤其觉得"陌生 / 有点难"的时候。难，往往不是智商问题，是它相对用户还存在"没接上的旧知识"。
+When the user is learning / encountering a new concept X (new technology, new algorithm, new theory, new field...), especially when they feel it is "unfamiliar / a bit hard." Difficulty is often not an intelligence problem; it is that relative to the user there is still "old knowledge that has not been connected up."
 
-## 流程
+## Process
 
-### 第一步：抓住 X 的本质结构（不堆术语）
+### Step 1: Grasp the essential structure of X (do not pile on jargon)
 
-用一两句话说清 X 到底在干什么——它的核心机制 / 结构是什么。剥掉术语外壳，留下"它本质是一个 ___"。**只有先拿到结构，才能去匹配用户学过的东西。**
+Use a sentence or two to state clearly what X is actually doing — what its core mechanism / structure is. Strip off the shell of jargon and leave "in essence it is a ___." **Only once you have the structure can you go match it against what the user has learned.**
 
-### 第二步：弄清用户已经会什么
+### Step 2: Figure out what the user already knows
 
-**主动询问**，建立"用户已掌握知识"的清单：
+**Actively ask** to build a checklist of the "knowledge the user has mastered":
 
-- 问用户的背景：学过哪些相关领域、做过什么项目、熟悉哪些工具 / 理论
-- 只采纳对话中用户**亲口确认**学过的知识
-- 目的：找出与 X 结构同构、或能解释 X 的旧知识
+- Ask about the user's background: which related fields they have studied, what projects they have done, which tools / theories they are familiar with
+- Only adopt knowledge the user has **personally confirmed** in the conversation that they have learned
+- Purpose: find old knowledge that is structurally isomorphic to X, or that can explain X
 
-拿不准就直接问「你学过 ___ 吗？」，**绝不从正在讲的材料 / 文章作者背景推断用户会什么**。
+When unsure, just ask "Have you studied ___?", and **never infer what the user knows from the material being taught / the article author's background**.
 
-### 第三步：按"跨界三猜想"组织输出（核心）
+### Step 3: Organize output around the "three crossover conjectures" (core)
 
-1. **🎁 你其实已经学过（换了名字）** —— 最高优先。X 是否就是用户已知的 Y 换了个领域名称？（如 导数 = 梯度 = 变化率）。命中就直接说"你已经会了，它只是改名叫 X"。
-2. **🔗 结构同构（非常像）** —— 给出用户学过的 Z 与 X 的**字段级对应表**（A↔a、B↔b……），并**明确标出哪里相同、哪里不同**。铁律：不一样归不一样，但相似部分就是学习杠杆，别因为"严格不同"就不用它。
-3. **🧩 可被解释（用已有知识解释）** —— 用用户已掌握的 W 把 X 讲通。
+1. **🎁 You have in fact already learned it (under a different name)** — highest priority. Is X just the Y the user already knows with a different field name? (e.g. derivative = gradient = rate of change). On a hit, just say "you already know it, it is merely renamed X."
+2. **🔗 Structurally isomorphic (very similar)** — provide a **field-level correspondence table** between the Z the user has learned and X (A↔a, B↔b...), and **explicitly mark what is the same and what is different**. Iron rule: what differs is what differs, but the similar parts are the learning lever — do not refuse to use it just because it is "strictly different."
+3. **🧩 Can be explained (explained with existing knowledge)** — use the W the user has mastered to make X clear.
 
-### 第四步：点出元知识
+### Step 4: Point out the meta-knowledge
 
-X 体现了哪个**反复出现的底层模式**？（分治、自举 / bootstrap、阻尼-负反馈、探索 vs 应用、量变质变、控制变量、状态机……）。告诉用户"这个模式你在 ___、___ 也见过"，把 X 挂到他的元知识网上。
+Which **recurring underlying pattern** does X embody? (divide and conquer, self-bootstrapping / bootstrap, damping-negative feedback, exploration vs. exploitation, quantitative change to qualitative change, controlling variables, state machine...). Tell the user "you have also seen this pattern in ___, ___," hooking X onto their meta-knowledge network.
 
-### 第五步：落点
+### Step 5: Landing point
 
-一句话收尾，降低学习恐惧 + 指明剩下要新学的最小部分：
+Wrap up in one sentence, lowering the fear of learning + pointing out the minimal part that remains to be newly learned:
 
-> "所以 X 你已经会了 ___ 部分，真正全新、需要从头学的只有 ___。"
+> "So for X you already know the ___ part; the only thing that is truly new and needs to be learned from scratch is ___."
 
-## 注意
+## Notes
 
-> ⚠️ **铁律·只用确证的已会知识**：判断用户「已经会什么」只能用他**确证学过**的知识（亲口确认或可靠背景）；**严禁**把「正在讲的材料 / 文章作者背景 / 对话里别人的知识」当成用户会的。拿不准 → 直接问「⚠️ 你学过 ___ 吗？」，绝不替他假设。（最常见的翻车点：把材料作者的背景错安到学习者头上，整段跨界作废。）
+> ⚠️ **Iron rule · only use confirmed known knowledge**: judging "what the user already knows" may only use knowledge they have **confirmed learning** (personally confirmed or reliable background); it is **strictly forbidden** to treat "the material being taught / the article author's background / someone else's knowledge in the conversation" as what the user knows. When unsure → just ask "⚠️ Have you studied ___?", and never assume on their behalf. (The most common wipeout point: wrongly pinning the material author's background onto the learner, which invalidates the whole crossover.)
 
-- **宁可多举具体例子**（案例驱动），别给抽象框架。
-- 结构对应要给到**字段级映射表**，不要泛泛说"它们很像"。
-- 不确定某个跨界连接是否成立时，**标注"这是个待验证的类比"**——提出假说，允许被推翻。
-- 同族 skill：要"该不该学"用 `learn-occam`，要"系统建图"用 `learn-graph`，要"动手迭代"用 `learn-prototype`，要"自查懂没懂"用 `learn-feynman`。
+- **Better to give more concrete examples** (case-driven); do not hand over an abstract framework.
+- Structural correspondence must be given down to the **field-level mapping table**; do not vaguely say "they are very similar."
+- When unsure whether a crossover connection holds, **mark it "this is an analogy yet to be verified"** — propose a hypothesis, allow it to be refuted.
+- Sibling skills: for "should I learn this at all" use `learn-occam`, for "systematically build a map" use `learn-graph`, for "hands-on iteration" use `learn-prototype`, for "self-check whether I understood" use `learn-feynman`.

@@ -1,42 +1,42 @@
 ---
 name: learn-occam
-description: 当用户纠结要不要学某个东西、学到什么程度，或在做时间/精力/项目取舍时使用。用「简易策略」先逼问要解决的既定问题，检验现有知识能否搞定，评估知识贬值速度与 ROI，用「探索 vs 应用」判断该学新的还是用现有的，给出「学 / 不学 / 只学最小够用」的结论，避免囤积会贬值的知识。触发场景：要不要学 X、值不值得深入、学到什么程度够、时间不够该学啥、该深挖还是够用就行。
+description: Use when the user is torn over whether to learn something and to what depth, or when making trade-offs across time / energy / projects. The "simplification strategy" first presses for the established problem to be solved, checks whether existing knowledge can handle it, assesses the rate of knowledge depreciation and ROI, uses "exploration vs. application" to judge whether to learn something new or use what already exists, and delivers a "learn / don't learn / learn only the minimum sufficient" verdict, avoiding the hoarding of knowledge that will depreciate. Triggers: whether to learn X, whether it's worth going deep, how deep is enough, what to learn when time is short, whether to dig deep or just get by.
 ---
 
-# 简易策略（learn-occam）
+# Simplification Strategy (learn-occam)
 
-> 核心信条：**这世界最有价值的不是知识，是你的时间。** 能用现有知识解决的就别学新的；以后要用的，以后再学。
+> Core creed: **The most valuable thing in this world is not knowledge, it is your time.** If something can be solved with existing knowledge, don't learn something new; what you'll need later, learn later.
 
-## 何时用
+## When to use
 
-用户在纠结"要不要学 X / 学到什么程度 / 精力往哪放"。这是"广度优先、兴趣队列过长"倾向的**刹车**。
+The user is torn over "whether to learn X / to what depth / where to put energy." This is the **brake** on the "breadth-first, over-long interest queue" tendency.
 
-## 流程
+## Process
 
-### 第一步：先找"既定问题"
+### Step 1: First find the "established problem"
 
-逼问一句：**你要解决的具体问题是什么？** 没有具体问题、纯"感觉该学 / 别人都在学"→ 直接进"以后再学"队列，不占当下精力。理解知识的作用，重于知识本身。
+Press with one question: **What is the specific problem you want to solve?** No specific problem, purely "feels like I should learn it / everyone else is learning it" → go straight into the "learn later" queue, taking no energy right now. Understanding the function of knowledge matters more than the knowledge itself.
 
-### 第二步：现有知识能不能搞定
+### Step 2: Can existing knowledge handle it
 
-**问清用户已经会什么**——能解决就**别学新的**。拿不准"是不是其实已经会了"就配合 `learn-crossover`。
+**Ask clearly what the user already knows**—if it can solve the problem, **don't learn something new**. If unsure "whether they might already know it," pair with `learn-crossover`.
 
-### 第三步：贬值速度 + ROI
+### Step 3: Depreciation rate + ROI
 
-这知识多久会贬值？（技术栈 / 工具往往 6–12 个月就明显更新）相对有限的时间值不值？**贬值快 + 可外包给 AI / 随时查 → 只需"知道它存在、管什么"，不必真学。**
+How soon will this knowledge depreciate? (Tech stacks / tools often update noticeably within 6–12 months) Is it worth it relative to your limited time? **Depreciates fast + can be outsourced to AI / looked up anytime → you only need to "know it exists and what it governs," no need to truly learn it.**
 
-### 第四步：探索 vs 应用（N 臂老虎机）
+### Step 4: Exploration vs. application (N-armed bandit)
 
-现在该"探索"（学新）还是"应用"（用现有）？探索成本越高 → 越该偏应用。只有目标够难、现有知识确实够不着时，简易策略才**督促**你学。
+Right now, should you "explore" (learn new) or "apply" (use existing)? The higher the cost of exploration → the more you should lean toward application. Only when the goal is hard enough and existing knowledge truly can't reach it does the simplification strategy **push** you to learn.
 
-### 第五步：给结论
+### Step 5: Give the verdict
 
-明确三选一：**① 学**（值得且现有搞不定）/ **② 不学**（入"以后再学"队列）/ **③ 只学最小够用的那一块**（点明是哪一小块）。要深挖就转 `learn-graph` 建路径。
+Clearly pick one of three: **① Learn** (worth it and existing knowledge can't handle it) / **② Don't learn** (into the "learn later" queue) / **③ Learn only the minimum sufficient piece** (point out exactly which small piece). If deep diving is needed, switch to `learn-graph` to build a path.
 
-## 注意
+## Notes
 
-> ⚠️ **铁律·只用确证的已会知识**：判断用户「已经会什么」只能用他**确证学过**的知识（亲口确认或可靠背景）；**严禁**把「正在讲的材料 / 文章作者背景 / 对话里别人的知识」当成用户会的。拿不准 → 直接问「⚠️ 你学过 ___ 吗？」，绝不替他假设。
+> ⚠️ **Iron rule · Use only confirmed known knowledge**: Judging "what the user already knows" may only rely on knowledge they have **confirmably learned** (personally confirmed or reliable background); it is **strictly forbidden** to treat "the material being taught / the article author's background / knowledge others have in the conversation" as something the user knows. If unsure → ask directly "⚠️ Have you learned ___?"—never assume it on their behalf.
 
-- 简易策略不是"少学"，是"让问题决定你学什么"。
-- 它的缺点是易陷局部最优——拿不准"是不是缺前置知识"时转 `learn-graph`。
-- 同族 skill：`learn-crossover`(已会什么) `learn-graph`(系统建图) `learn-prototype`(动手迭代) `learn-feynman`(自查)。
+- The simplification strategy is not "learn less," it is "let the problem decide what you learn."
+- Its downside is a tendency to get stuck in local optima—when unsure "whether prerequisite knowledge is missing," switch to `learn-graph`.
+- Sibling skills: `learn-crossover` (what you already know) `learn-graph` (systematic mapping) `learn-prototype` (hands-on iteration) `learn-feynman` (self-check).

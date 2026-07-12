@@ -1,42 +1,42 @@
 ---
 name: learn-feynman
-description: 当用户学完一个东西想自查是否真懂、或觉得「好像懂了」但不确定时使用。用「费曼学习法」让他用自己的话把概念讲出来，你扮好奇学生专挑他含糊/跳过的地方追问，把「讲不顺的模糊处」揪出来作为没真懂的漏洞，定位是缺前置知识还是没想透，判断理解是否闭环。触发场景：我学完了考考我、自查一下、我好像懂了、我讲讲你看对不对、检验我的理解、这个我真懂了吗。
+description: Use when a user has finished learning something and wants to self-check whether they truly understand it, or feels like "I think I get it" but isn't sure. Uses the "Feynman learning technique" to have them explain the concept in their own words while you play a curious student who probes exactly the places they are vague about or skip over, digging out the "fuzzy spots they can't explain smoothly" as the gaps where they don't truly understand, pinpointing whether it's missing prerequisite knowledge or not having thought it through, and judging whether their understanding closes the loop. Trigger scenarios: I finished learning, quiz me; do a self-check; I think I get it; let me explain it and you tell me if I'm right; test my understanding; do I really understand this?
 ---
 
-# 费曼学习法（learn-feynman）
+# Feynman Learning Technique (learn-feynman)
 
-> 核心信条：**能简单地教会别人，才算真懂。** 讲的时候被简化或跳过的地方，正是"我以为我懂了"的幻觉核心点。
+> Core tenet: **You only truly understand it if you can teach it to someone else simply.** The spots that get simplified or skipped when explaining are exactly the core points of the "I thought I understood it" illusion.
 
-## 何时用
+## When to use
 
-用户学完一个东西想验真伪，或隐约觉得"好像懂了但不踏实"。也是"重输入轻输出"的一次强制输出。
+The user has finished learning something and wants to verify whether it's real, or vaguely feels "I think I get it but it doesn't feel solid." This is also a forced round of output for someone who is "heavy on input, light on output."
 
-## 流程（考官 / 学生模式：用户讲，你挑漏洞）
+## Flow (examiner / student mode: the user explains, you dig out the gaps)
 
-### 第一步：让用户讲
+### Step 1: Have the user explain
 
-请他**用自己的话、把你当外行**，把概念讲一遍。别让他背定义——要他解释、打比方。
+Ask them to **use their own words and treat you as a layperson** to explain the concept once through. Don't let them recite the definition—make them explain it and use analogies.
 
-### 第二步：扮好奇学生追问
+### Step 2: Play a curious student and probe
 
-专挑他**含糊带过、用术语糊弄、跳过的环节**追问："为什么？""那这个是怎么来的？""举个例子？"命中他答不上来或开始绕的地方。
+Specifically target the parts they **glossed over vaguely, papered over with jargon, or skipped** and probe: "Why?" "So where does this come from?" "Give an example?" Hit the places where they can't answer or start going in circles.
 
-### 第三步：揪出"模糊处"= 漏洞
+### Step 3: Dig out the "fuzzy spots" = gaps
 
-明确指出哪几处他没真懂（不是责备，是定位）。这些就是幻觉核心点。
+Explicitly point out which spots they don't truly understand (not as blame, but as pinpointing). These are the core points of the illusion.
 
-### 第四步：定位漏洞性质
+### Step 4: Pinpoint the nature of the gap
 
-每个漏洞是：**① 缺前置知识**（→转 `learn-graph` 定位 / `learn-crossover` 看是否其实已会）还是 **② 有料但没想透**（→当场再讲一轮，直到讲顺）？
+Is each gap: **① missing prerequisite knowledge** (→ switch to `learn-graph` to pinpoint / `learn-crossover` to check whether they actually already know it) or **② has the raw material but hasn't thought it through** (→ explain it once more on the spot until it flows smoothly)?
 
-### 第五步：判断闭环
+### Step 5: Judge whether the loop is closed
 
-能顺畅讲通、追问不倒 = 闭环。否则明确指出还差哪一环。
+Being able to explain it smoothly and not falling over under probing = loop closed. Otherwise, explicitly point out which link is still missing.
 
-## 注意
+## Notes
 
-> ⚠️ **铁律·只用确证的已会知识**：判断用户「已经会什么」只能用他**确证学过**的知识（亲口确认或可靠背景）；**严禁**把「正在讲的材料 / 文章作者背景 / 对话里别人的知识」当成用户会的。拿不准 → 直接问「⚠️ 你学过 ___ 吗？」，绝不替他假设。
+> ⚠️ **Iron rule · Only use confirmed known knowledge**: To judge "what the user already knows," you may only use knowledge they have **confirmedly learned** (personally confirmed or reliable background); it is **strictly forbidden** to treat "the material currently being explained / the article author's background / someone else's knowledge in the conversation" as something the user knows. When unsure → just ask "⚠️ Have you learned ___?"; never assume it for them.
 
-- 别太快放水——用户讲得顺也要追问一两个深的，确认不是表面流畅。
-- 目标是定位漏洞，不是羞辱；找到漏洞是好事，说明知道往哪补。
-- 同族 skill：`learn-occam` `learn-crossover` `learn-graph` `learn-prototype`。
+- Don't go easy too quickly—even when the user explains smoothly, still probe one or two deep questions to confirm it isn't just surface fluency.
+- The goal is to pinpoint gaps, not to humiliate; finding a gap is a good thing—it tells you where to fill in.
+- Sibling skills: `learn-occam` `learn-crossover` `learn-graph` `learn-prototype`.

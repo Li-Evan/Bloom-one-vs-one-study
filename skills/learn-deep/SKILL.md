@@ -1,45 +1,45 @@
 ---
 name: learn-deep
-description: 用户学任何新概念/新技术/新理论的默认深度入口——一次性用五个视角把概念讲透并帮他选深入方向：crossover 用已会的撬动、occam 框定该学多深、graph 建知识地图、prototype 最小原型迭代、feynman 拷问检验。触发场景：我想学 X、理解 X、X 是什么、讲讲 X、搞懂 X、学一下 X、深入 X、给我讲讲 X。除非用户明确只要某一个视角（那时改用对应的单个 learn-* skill）。
+description: The default in-depth entry point for whenever a user learns any new concept / new technology / new theory — it explains the concept thoroughly through five lenses in one pass and helps them choose a direction to go deeper: crossover leverages what they already know, occam frames how deep they should learn, graph builds a knowledge map, prototype iterates on a minimal prototype, feynman interrogates and tests. Trigger scenarios: I want to learn X, understand X, what is X, tell me about X, get a grip on X, learn a bit of X, go deep on X, walk me through X. Unless the user explicitly wants only one lens (in which case switch to the corresponding single learn-* skill).
 ---
 
-# 深度学习一个概念（learn-deep）
+# Learn a concept in depth (learn-deep)
 
-> 把 `learn-crossover` / `learn-occam` / `learn-graph` / `learn-prototype` / `learn-feynman` 五个视角编排成一遍全景，给用户学任何概念的"一次扫透 + 选方向"。
+> Orchestrates the five lenses `learn-crossover` / `learn-occam` / `learn-graph` / `learn-prototype` / `learn-feynman` into a single panoramic pass, giving the user a "one sweep through + pick a direction" for learning any concept.
 
-## 何时用
+## When to use
 
-用户说"想学 / 理解 / 搞懂 / 讲讲一个概念 X"时——**这是默认入口**，一次跑完五视角，用户再选深入哪个。
-**例外**：用户明确只要某一个角度（"用跨界讲""帮我建图谱""考考我"）→ 直接用对应的单个 `learn-*` skill，别全跑。
+When the user says "I want to learn / understand / get a grip on / tell me about a concept X" — **this is the default entry point**: run all five lenses in one pass, then let the user choose which to go deeper on.
+**Exception**: the user explicitly wants only one angle ("explain it with a crossover", "help me build a map", "quiz me") → use the corresponding single `learn-*` skill directly, don't run them all.
 
-## 开跑前
+## Before starting
 
-**先问清用户的背景**：学过哪些相关领域、做过什么、熟悉哪些工具 / 理论。后面 crossover / occam / graph 都要用到。只采纳用户亲口确认学过的。
+**First, ask about the user's background**: which related fields they've studied, what they've built, which tools / theories they're familiar with. crossover / occam / graph all rely on this later. Only accept what the user has personally confirmed they've learned.
 
-## 五视角执行顺序（这个弧线最顺：先降门槛 → 定深度 → 给地图 → 动手 → 验收）
+## Execution order of the five lenses (this arc flows best: first lower the barrier → set the depth → provide a map → get hands-on → verify mastery)
 
-### 1️⃣ crossover — 先用"你已经会一半"降门槛
-抓住 X 的本质结构（剥术语），按三猜想给 🎁其实已学过 / 🔗结构同构（字段级对应表）/ 🧩可用已有知识解释，点出元知识。**先激发信心，再谈深入。**
+### 1️⃣ crossover — first lower the barrier with "you already know half of it"
+Grab the essential structure of X (strip the jargon), and following the three conjectures point out the meta-knowledge: 🎁 already learned it / 🔗 structurally isomorphic (field-level correspondence table) / 🧩 explainable with existing knowledge. **First build confidence, then talk about going deeper.**
 
-### 2️⃣ occam — 框定"该学多深"
-定位"既定问题"（学 X 解决什么）、现有知识够不够、X 的贬值速度与 ROI，给"够用就停 / 只学最小那块 / 值得深挖"的**深度边界**。不是劝退，是防止一上来过度钻。
+### 2️⃣ occam — frame "how deep should you learn"
+Pin down the "given problem" (what does learning X solve), whether existing knowledge is enough, X's rate of depreciation and ROI, and give a **depth boundary**: "stop once it's good enough / only learn the minimal piece / worth deep digging". This isn't about talking them out of it, it's to prevent over-drilling right from the start.
 
-### 3️⃣ graph — 给一张地图，知道 X 在哪、学到哪算够
-X 在所属领域的知识图谱骨架（概念/用途/父子节点），标复用价值最高的节点 + 从常识能入门的点，给学习路径。**引导用户补节点**（自己建图才学得到）。
+### 3️⃣ graph — provide a map so they know where X sits and when they've learned enough
+The skeleton of X's knowledge graph within its field (concepts/uses/parent-child nodes), marking the highest-reuse-value nodes + the entry points reachable from common sense, and give a learning path. **Guide the user to fill in nodes** (you only learn it by building the map yourself).
 
-### 4️⃣ prototype — 给最小原型起点，把动手的球递给用户
-给"最垃圾但能跑的原型"起点 + 引导式提问（让用户自己洞察缺陷），预告会撞到的坑。**不替他做。**
+### 4️⃣ prototype — provide a minimal-prototype starting point and pass the hands-on ball to the user
+Give a "trashiest-but-it-runs prototype" starting point + guiding questions (let the user discover the flaws themselves), and forewarn the pitfalls they'll hit. **Don't do it for them.**
 
-### 5️⃣ feynman — 抛 2–4 个直击盲点的问题验收
-让用户用自己的话答，答不顺处 = 没真懂的洞。最后一个问题尽量打在 X 的根本局限上（真懂的试金石）。
+### 5️⃣ feynman — throw out 2–4 questions that hit the blind spots to verify mastery
+Have the user answer in their own words; the spots where the answer doesn't flow = the gaps where they don't truly understand. Aim the last question at X's fundamental limitations (the touchstone of true understanding).
 
-### 6️⃣ 收尾：选方向
-**明确推荐往哪 1–2 个方向深入**（综合 occam 的 ROI 判断 + 用户的目标 + 哪个视角最戳中他），并指出对应该接哪个单 skill（要动手→`learn-prototype`，要验收→`learn-feynman`）。
+### 6️⃣ Wrap-up: pick a direction
+**Explicitly recommend which 1–2 directions to go deeper on** (combining occam's ROI judgment + the user's goals + which lens struck them most), and point out which single skill to hand off to next (want to get hands-on → `learn-prototype`, want to verify mastery → `learn-feynman`).
 
-## 注意
+## Notes
 
-> ⚠️ **铁律·只用确证的已会知识**：判断用户「已经会什么」只能用他**确证学过**的知识（亲口确认或可靠背景）；**严禁**把「正在讲的材料 / 文章作者背景 / 对话里别人的知识」当成用户会的。拿不准 → 直接问「⚠️ 你学过 ___ 吗？」，绝不替他假设。
+> ⚠️ **Iron rule · only use confirmed prior knowledge**: judging "what the user already knows" may only draw on knowledge they have **confirmed they've learned** (personally confirmed or reliable background); it is **strictly forbidden** to treat "the material currently being explained / the article author's background / other people's knowledge in the conversation" as something the user knows. When unsure → just ask "⚠️ Have you learned ___?", never assume on their behalf.
 
-- **五视角各有侧重、严禁重复**：crossover 撬动 / occam 只谈该学多深 / graph 只给地图 / prototype 只给动手路径 / feynman 只拷问。同一段内容不要讲五遍。
-- **每个视角精炼**——这是"全景扫一遍"，深入留给用户选完之后。宁短勿灌。
-- 单视角细分入口（用户只要一个时用）：`learn-crossover` `learn-occam` `learn-graph` `learn-prototype` `learn-feynman`。
+- **Each of the five lenses has its own focus, repetition is strictly forbidden**: crossover leverages / occam only discusses how deep to learn / graph only gives a map / prototype only gives the hands-on path / feynman only interrogates. Don't explain the same content five times over.
+- **Keep each lens concise** — this is a "sweep through the panorama", the deep dive is left for after the user chooses. Better too short than to overload.
+- Single-lens sub-entry points (use when the user wants only one): `learn-crossover` `learn-occam` `learn-graph` `learn-prototype` `learn-feynman`.
