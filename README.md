@@ -171,7 +171,7 @@ Bloom ships a set of portable **[Claude Code](https://claude.com/claude-code) sk
 
 | Skill | What it does |
 |-------|-------------|
-| **bloom-tutor** | The full interactive tutoring system as one skill — syllabus → adaptive lessons → `???` annotations → evaluation → summary. CLI mode, packaged and portable. |
+| **bloom-tutor** | The full interactive tutoring system as one skill — syllabus → adaptive lessons → `???` annotations → part evaluations → final evaluation → summary + cheatsheet. CLI mode, packaged and portable. |
 | **learn-deep** | Default deep-dive entry — runs all five lenses below in one pass, then helps you pick a direction |
 | **learn-crossover** | Learn a new concept by leveraging what you already know (structural analogies) |
 | **learn-occam** | Decide whether / how deeply something is worth learning (ROI, just-enough) |
@@ -180,6 +180,17 @@ Bloom ships a set of portable **[Claude Code](https://claude.com/claude-code) sk
 | **learn-feynman** | Verify true understanding by explaining it back |
 
 Each folder is dependency-free: copy it into a skills directory, then just talk to Claude Code (e.g. *"help me learn X"*, *"I'm done reading"*).
+
+### What the tutor does (CLI)
+
+- **Two axes per course** — depth (*simple / standard / deep*) × length (*standard* ~3-5 modules, or *extended* ~12-20 modules grouped into Parts — say *"marathon course on X"*)
+- **Fitted to you** — one short preference round per new course (goal, background, style) recorded as "Learner Notes" in the syllabus; lessons bridge from what you already know and silently adapt as patterns emerge
+- **Evidence-based pedagogy** — spiral retrieval questions from earlier lessons, confidence ratings with miscalibration flags 🚩 (confident-but-wrong is re-taught first), misconception boxes ⚠️, worked-example → solo scaffolding, plain-language Feynman gates at Part boundaries
+- **Practice arenas** — for performable skills (editors, CLIs, languages), lessons generate real exercise files under `practice/` that you work in the actual tool; extended courses close with a capstone project
+- **Progress you can see** — mastery progress bar and a module dependency map in every syllabus; each Part ends in a "mid-boss" evaluation, the course in a final-boss evaluation with an S/A/B/C rank, a completion certificate, and a `cheatsheet.md` built for lookup-while-doing
+- **Curiosity honored** — off-syllabus `???` annotations can spawn optional side quests that never block progress
+- **Retention after the course** — completed topics get spaced flash reviews (7 → 30 → 90 days) offered from your learning log
+- **Learn from your own library** — *"learn X from ./books"* builds a `sources.md` manifest from a folder of PDFs and grounds the whole course in your materials, with real citations and honest out-of-scope boundaries
 
 ## Tech Stack
 
@@ -228,7 +239,9 @@ make up / make down   # docker start / stop
 | **Bloom's 2 Sigma** | 1-on-1 tutoring = +2σ performance over classroom |
 | **Mastery Learning** | Don't move on until the concept is truly understood |
 | **Socratic Method** | Ask questions, don't hand answers |
-| **Spaced Retrieval** | Thought question reviews at lesson start reinforce memory |
+| **Spaced Retrieval** | Thought-question reviews, spiral questions from earlier lessons, and post-course flash reviews reinforce memory |
+| **Calibration** | Confidence ratings expose confident-but-wrong answers — the highest-priority re-teach targets |
+| **Deliberate Practice** | Practice arenas and capstones exercise the skill in the real tool, not just in prose |
 | **Adaptive Path** | Content adjusts to individual feedback in real-time |
 
 ## Star History
